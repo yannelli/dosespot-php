@@ -1,0 +1,87 @@
+<?php
+
+declare(strict_types=1);
+
+use Yannelli\DoseSpot\Exceptions\ApiException;
+use Yannelli\DoseSpot\Exceptions\AuthenticationException;
+use Yannelli\DoseSpot\Exceptions\NotFoundException;
+use Yannelli\DoseSpot\Exceptions\RateLimitException;
+use Yannelli\DoseSpot\Exceptions\ValidationException;
+
+it('adds the bearer token to outgoing requests', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 1]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->general()->check();
+
+    $request = $factory->lastRequest();
+    expect($request->getHeaderLine('Authorization'))->toBe('Bearer cached-token');
+    expect($request->getHeaderLine('Accept'))->toBe('application/json');
+    expect((string) $request->getUri())
+        ->toBe('https://my.staging.dosespot.com/webapi/api/general/check');
+});
+
+it('serializes booleans, datetimes, and skips nulls in query strings', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->patients()->search(
+        firstName: 'Jane',
+        lastName: null,
+        dob: new DateTimeImmutable('1990-01-02 03:04:05'),
+    );
+
+    $uri = (string) $factory->lastRequest()->getUri();
+    expect($uri)->toContain('firstname=Jane');
+    expect($uri)->toContain('dob=1990-01-02T03%3A04%3A05');
+    expect($uri)->not->toContain('lastname=');
+});
+
+it('throws a NotFoundException on 404', function () {
+    $factory = factory();
+    $factory->pushResponse(404, ['Message' => 'patient not found']);
+
+    expect(fn () => $factory->preauthorizedClient()->patients()->find(999))
+        ->toThrow(NotFoundException::class, 'patient not found');
+});
+
+it('throws a ValidationException on 400 / 422', function () {
+    $factory = factory();
+    $factory->pushResponse(400, ['Result' => ['ResultDescription' => 'bad data']]);
+
+    expect(fn () => $factory->preauthorizedClient()->patients()->create([]))
+        ->toThrow(ValidationException::class, 'bad data');
+});
+
+it('throws an AuthenticationException on 401', function () {
+    $factory = factory();
+    $factory->pushResponse(401, ['Message' => 'unauthorized']);
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(AuthenticationException::class, 'unauthorized');
+});
+
+it('throws a RateLimitException on 429 and surfaces Retry-After', function () {
+    $factory = factory();
+    $factory->pushResponse(429, ['Message' => 'slow down'], ['Retry-After' => '5']);
+
+    try {
+        $factory->preauthorizedClient()->general()->check();
+        fail('Expected RateLimitException');
+    } catch (RateLimitException $e) {
+        expect($e->statusCode())->toBe(429);
+        expect($e->retryAfter())->toBe(5);
+    }
+});
+
+it('throws a generic ApiException on 500-class responses', function () {
+    $factory = factory();
+    $factory->pushResponse(500, ['Message' => 'boom']);
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(ApiException::class, 'boom');
+});

@@ -1,45 +1,56 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "yannelli/dosespot-php",
+    "description": "A modern PHP client for the DoseSpot e-prescribing Web API.",
     "keywords": [
-        ":vendor_name",
-        ":package_slug"
+        "yannelli",
+        "dosespot",
+        "dosespot-php",
+        "e-prescribing",
+        "eprescribing",
+        "epcs",
+        "rx",
+        "api-client",
+        "healthcare"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/yannelli/dosespot-php",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
+            "name": "Yannelli",
             "email": "author@domain.com",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": "^8.4"
+        "php": "^8.4",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.8"
     },
     "require-dev": {
-        :require_dev_testing,
-        :require_dev_codestyle,
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "pestphp/pest": "^3.0",
+        "phpunit/phpunit": "^11.0",
         "spatie/ray": "^1.28"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src"
+            "Yannelli\\DoseSpot\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "Yannelli\\DoseSpot\\Tests\\": "tests"
         }
     },
     "scripts": {
-        :scripts_testing,
-        :scripts_codestyle
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/php-cs-fixer fix"
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            :plugins_testing,
+            "pestphp/pest-plugin": true,
             "phpstan/extension-installer": true
         }
     },
