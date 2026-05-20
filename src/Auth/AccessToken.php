@@ -11,7 +11,8 @@ class AccessToken
         public readonly string $tokenType,
         public readonly int $expiresAt,
         public readonly ?int $userId = null,
-    ) {}
+    ) {
+    }
 
     public function isExpired(int $leewaySeconds = 30): bool
     {

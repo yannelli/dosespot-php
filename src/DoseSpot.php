@@ -39,7 +39,7 @@ class DoseSpot
         ?ClientInterface $guzzle = null,
         ?Authenticator $authenticator = null,
     ) {
-        $guzzle ??= new GuzzleClient;
+        $guzzle ??= new GuzzleClient();
         $this->authenticator = $authenticator ?? new Authenticator($config, $guzzle);
         $this->http = new HttpClient($config, $guzzle, $this->authenticator);
     }

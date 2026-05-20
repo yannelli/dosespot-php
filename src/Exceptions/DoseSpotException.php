@@ -6,4 +6,6 @@ namespace Yannelli\DoseSpot\Exceptions;
 
 use Exception;
 
-class DoseSpotException extends Exception {}
+class DoseSpotException extends Exception
+{
+}

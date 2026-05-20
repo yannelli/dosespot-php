@@ -21,7 +21,8 @@ class HttpClient
         private readonly Config $config,
         private readonly ClientInterface $httpClient,
         private readonly Authenticator $authenticator,
-    ) {}
+    ) {
+    }
 
     public function get(string $path, array $query = []): Response
     {

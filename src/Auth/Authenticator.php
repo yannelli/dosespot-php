@@ -17,8 +17,9 @@ class Authenticator
     public function __construct(
         private readonly Config $config,
         private readonly ClientInterface $httpClient,
-        private readonly KeyGenerator $keyGenerator = new KeyGenerator,
-    ) {}
+        private readonly KeyGenerator $keyGenerator = new KeyGenerator(),
+    ) {
+    }
 
     public function token(): AccessToken
     {

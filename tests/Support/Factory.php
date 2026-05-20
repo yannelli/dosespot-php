@@ -25,7 +25,7 @@ class Factory
 
     public function __construct()
     {
-        $this->mockHandler = new MockHandler;
+        $this->mockHandler = new MockHandler();
     }
 
     public function pushResponse(int $status = 200, array $json = [], array $headers = []): void

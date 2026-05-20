@@ -9,5 +9,5 @@ pest()->extends(TestCase::class)->in(__DIR__);
 
 function factory(): Factory
 {
-    return new Factory;
+    return new Factory();
 }

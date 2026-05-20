@@ -9,7 +9,9 @@ use Yannelli\DoseSpot\Http\Response;
 
 abstract class Resource
 {
-    public function __construct(protected readonly HttpClient $client) {}
+    public function __construct(protected readonly HttpClient $client)
+    {
+    }
 
     protected function get(string $path, array $query = []): array
     {

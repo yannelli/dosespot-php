@@ -10,7 +10,9 @@ class Response
 {
     private ?array $decoded = null;
 
-    public function __construct(public readonly ResponseInterface $raw) {}
+    public function __construct(public readonly ResponseInterface $raw)
+    {
+    }
 
     public function statusCode(): int
     {
