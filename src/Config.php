@@ -33,12 +33,12 @@ class Config
 
     public function tokenUrl(): string
     {
-        return $this->baseUrl . '/token';
+        return $this->baseUrl.'/token';
     }
 
     public function apiUrl(string $path): string
     {
-        return $this->baseUrl . '/' . ltrim($path, '/');
+        return $this->baseUrl.'/'.ltrim($path, '/');
     }
 
     public function withUserId(int $userId): self

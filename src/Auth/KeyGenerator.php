@@ -21,12 +21,12 @@ class KeyGenerator
     {
         $seed ??= $this->randomBytes(32);
 
-        $hash = hash('sha512', $seed . $clinicKey, true);
+        $hash = hash('sha512', $seed.$clinicKey, true);
 
         $prefix = substr(base64_encode($seed), 0, 22);
         $body = substr(base64_encode($hash), 0, 32);
 
-        return $prefix . $body;
+        return $prefix.$body;
     }
 
     protected function randomBytes(int $length): string

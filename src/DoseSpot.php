@@ -31,6 +31,7 @@ use Yannelli\DoseSpot\Resources\Supplies;
 class DoseSpot
 {
     public readonly HttpClient $http;
+
     public readonly Authenticator $authenticator;
 
     public function __construct(
@@ -38,7 +39,7 @@ class DoseSpot
         ?ClientInterface $guzzle = null,
         ?Authenticator $authenticator = null,
     ) {
-        $guzzle ??= new GuzzleClient();
+        $guzzle ??= new GuzzleClient;
         $this->authenticator = $authenticator ?? new Authenticator($config, $guzzle);
         $this->http = new HttpClient($config, $guzzle, $this->authenticator);
     }

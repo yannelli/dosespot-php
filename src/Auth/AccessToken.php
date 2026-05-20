@@ -11,8 +11,7 @@ class AccessToken
         public readonly string $tokenType,
         public readonly int $expiresAt,
         public readonly ?int $userId = null,
-    ) {
-    }
+    ) {}
 
     public function isExpired(int $leewaySeconds = 30): bool
     {
@@ -21,6 +20,6 @@ class AccessToken
 
     public function authorizationHeader(): string
     {
-        return ucfirst($this->tokenType) . ' ' . $this->token;
+        return ucfirst($this->tokenType).' '.$this->token;
     }
 }

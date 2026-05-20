@@ -17,9 +17,8 @@ class Authenticator
     public function __construct(
         private readonly Config $config,
         private readonly ClientInterface $httpClient,
-        private readonly KeyGenerator $keyGenerator = new KeyGenerator(),
-    ) {
-    }
+        private readonly KeyGenerator $keyGenerator = new KeyGenerator,
+    ) {}
 
     public function token(): AccessToken
     {
@@ -69,7 +68,7 @@ class Authenticator
             ]);
         } catch (GuzzleException $e) {
             throw new AuthenticationException(
-                'Failed to reach DoseSpot token endpoint: ' . $e->getMessage(),
+                'Failed to reach DoseSpot token endpoint: '.$e->getMessage(),
                 $e->getCode(),
                 $e,
             );
@@ -82,7 +81,7 @@ class Authenticator
         if ($status < 200 || $status >= 300 || ! is_array($decoded) || ! isset($decoded['access_token'])) {
             $message = is_array($decoded) && isset($decoded['error_description'])
                 ? (string) $decoded['error_description']
-                : ('DoseSpot token request failed with HTTP ' . $status);
+                : ('DoseSpot token request failed with HTTP '.$status);
 
             throw new AuthenticationException($message, $status);
         }

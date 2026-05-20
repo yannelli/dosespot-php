@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Yannelli\DoseSpot\Auth\AccessToken;
 use Yannelli\DoseSpot\Auth\Authenticator;
 use Yannelli\DoseSpot\Exceptions\AuthenticationException;
 
@@ -52,7 +53,7 @@ it('refreshes the token after it expires', function () {
 
     $auth = new Authenticator($factory->config(), $factory->guzzle());
 
-    $expired = new \Yannelli\DoseSpot\Auth\AccessToken(
+    $expired = new AccessToken(
         token: 'first',
         tokenType: 'bearer',
         expiresAt: time() - 60,

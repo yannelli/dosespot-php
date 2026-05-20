@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
 use Yannelli\DoseSpot\Auth\AccessToken;
 use Yannelli\DoseSpot\Auth\Authenticator;
 use Yannelli\DoseSpot\Config;
@@ -17,14 +18,14 @@ use Yannelli\DoseSpot\Environment;
 
 class Factory
 {
-    /** @var list<array{0:string,1:\Psr\Http\Message\RequestInterface,2:array}> */
+    /** @var list<array{0:string,1:RequestInterface,2:array}> */
     public array $history = [];
 
     public MockHandler $mockHandler;
 
     public function __construct()
     {
-        $this->mockHandler = new MockHandler();
+        $this->mockHandler = new MockHandler;
     }
 
     public function pushResponse(int $status = 200, array $json = [], array $headers = []): void
@@ -87,7 +88,7 @@ class Factory
         ));
     }
 
-    public function lastRequest(): \Psr\Http\Message\RequestInterface
+    public function lastRequest(): RequestInterface
     {
         return $this->history[array_key_last($this->history)]['request'];
     }

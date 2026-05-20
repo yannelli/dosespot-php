@@ -21,8 +21,7 @@ class HttpClient
         private readonly Config $config,
         private readonly ClientInterface $httpClient,
         private readonly Authenticator $authenticator,
-    ) {
-    }
+    ) {}
 
     public function get(string $path, array $query = []): Response
     {
@@ -70,7 +69,7 @@ class HttpClient
             $raw = $this->httpClient->request($method, $this->config->apiUrl($path), $options);
         } catch (GuzzleException $e) {
             throw new ApiException(
-                'HTTP request to DoseSpot failed: ' . $e->getMessage(),
+                'HTTP request to DoseSpot failed: '.$e->getMessage(),
                 $e->getCode(),
             );
         }
@@ -151,7 +150,7 @@ class HttpClient
             return (string) $decoded['error'];
         }
 
-        return $body !== '' ? $body : ('DoseSpot API returned HTTP ' . $status);
+        return $body !== '' ? $body : ('DoseSpot API returned HTTP '.$status);
     }
 
     private function parseRetryAfter(Response $response): ?int
