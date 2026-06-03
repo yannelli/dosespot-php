@@ -21,13 +21,9 @@ class Notifications extends Resource
      */
     public function batchCounts(array $clinicianIds): array
     {
-        $query = [];
-
-        foreach (array_values($clinicianIds) as $i => $id) {
-            $query["clinicianId[{$i}]"] = $id;
-        }
-
-        return $this->get('api/notifications/batchCounts', $query);
+        return $this->get('api/notifications/batchCounts', [
+            'clinicianId' => $clinicianIds,
+        ]);
     }
 
     /**

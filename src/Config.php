@@ -6,9 +6,9 @@ namespace Yannelli\DoseSpot;
 
 use Yannelli\DoseSpot\Exceptions\DoseSpotException;
 
-class Config
+final class Config
 {
-    private string $baseUrl;
+    public readonly string $baseUrl;
 
     public function __construct(
         public readonly string $clinicId,
@@ -23,12 +23,11 @@ class Config
             throw new DoseSpotException('Clinic ID and Clinic Key are required.');
         }
 
-        $this->baseUrl = rtrim($baseUrl ?? $environment->baseUrl(), '/');
-    }
+        if ($timeout < 1 || $connectTimeout < 1) {
+            throw new DoseSpotException('timeout and connectTimeout must be positive.');
+        }
 
-    public function baseUrl(): string
-    {
-        return $this->baseUrl;
+        $this->baseUrl = rtrim($baseUrl ?? $environment->baseUrl(), '/');
     }
 
     public function tokenUrl(): string

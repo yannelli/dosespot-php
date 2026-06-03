@@ -6,7 +6,7 @@ namespace Yannelli\DoseSpot\Http;
 
 use Psr\Http\Message\ResponseInterface;
 
-class Response
+final class Response
 {
     private ?array $decoded = null;
 

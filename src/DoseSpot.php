@@ -28,20 +28,22 @@ use Yannelli\DoseSpot\Resources\RxChange;
 use Yannelli\DoseSpot\Resources\SelfReportedMedications;
 use Yannelli\DoseSpot\Resources\Supplies;
 
-class DoseSpot
+final class DoseSpot
 {
     public readonly HttpClient $http;
 
     public readonly Authenticator $authenticator;
+
+    private readonly ClientInterface $guzzle;
 
     public function __construct(
         public readonly Config $config,
         ?ClientInterface $guzzle = null,
         ?Authenticator $authenticator = null,
     ) {
-        $guzzle ??= new GuzzleClient();
-        $this->authenticator = $authenticator ?? new Authenticator($config, $guzzle);
-        $this->http = new HttpClient($config, $guzzle, $this->authenticator);
+        $this->guzzle = $guzzle ?? new GuzzleClient();
+        $this->authenticator = $authenticator ?? new Authenticator($config, $this->guzzle);
+        $this->http = new HttpClient($config, $this->guzzle, $this->authenticator);
     }
 
     public static function staging(string $clinicId, string $clinicKey, ?int $userId = null): self
@@ -64,9 +66,14 @@ class DoseSpot
         ));
     }
 
+    /**
+     * Return a new client scoped to a different DoseSpot user. The underlying
+     * Guzzle client (and its connection pool) is reused; the token cache is
+     * not — each user needs its own bearer token.
+     */
     public function asUser(int $userId): self
     {
-        return new self($this->config->withUserId($userId));
+        return new self($this->config->withUserId($userId), $this->guzzle);
     }
 
     public function allergies(): Allergies
