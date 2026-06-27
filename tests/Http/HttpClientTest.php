@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Yannelli\DoseSpot\Exceptions\ApiException;
 use Yannelli\DoseSpot\Exceptions\AuthenticationException;
 use Yannelli\DoseSpot\Exceptions\NotFoundException;
@@ -84,4 +87,41 @@ it('throws a generic ApiException on 500-class responses', function () {
 
     expect(fn () => $factory->preauthorizedClient()->general()->check())
         ->toThrow(ApiException::class, 'boom');
+});
+
+it('throws an AuthenticationException on 403', function () {
+    $factory = factory();
+    $factory->pushResponse(403, ['Message' => 'forbidden']);
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(AuthenticationException::class, 'forbidden');
+});
+
+it('wraps a network-level GuzzleException in an ApiException', function () {
+    $factory = factory();
+    $factory->mockHandler->append(
+        new ConnectException('Connection timed out', new Request('GET', 'test')),
+    );
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(ApiException::class, 'Connection timed out');
+});
+
+it('falls back to the raw body when no known error field is present', function () {
+    $factory = factory();
+    $factory->pushResponse(502, ['upstream' => 'unavailable']);
+
+    try {
+        $factory->preauthorizedClient()->general()->check();
+    } catch (ApiException $e) {
+        expect($e->getMessage())->toContain('upstream');
+    }
+});
+
+it('falls back to an HTTP status message when the response body is empty', function () {
+    $factory = factory();
+    $factory->mockHandler->append(new GuzzleResponse(503, [], ''));
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(ApiException::class, 'DoseSpot API returned HTTP 503');
 });
