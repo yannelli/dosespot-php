@@ -1,7 +1,7 @@
 # dosespot-php
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/yannelli/dosespot-php.svg?style=flat-square)](https://packagist.org/packages/yannelli/dosespot-php)
-[![Tests](https://img.shields.io/github/actions/workflow/status/yannelli/dosespot-php/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/yannelli/dosespot-php/actions/workflows/run-tests.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/yannelli/dosespot-php/run-tests-pest.yml?branch=main&label=tests&style=flat-square)](https://github.com/yannelli/dosespot-php/actions/workflows/run-tests-pest.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/yannelli/dosespot-php.svg?style=flat-square)](https://packagist.org/packages/yannelli/dosespot-php)
 
 A modern, framework-agnostic PHP client for the
