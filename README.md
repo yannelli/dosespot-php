@@ -32,7 +32,7 @@ $patient = $dosespot->patients()->create([
     'Active' => true,
 ]);
 
-$dosespot->prescriptions()->createCoded($patient['Id'], [
+$prescription = $dosespot->prescriptions()->createCoded($patient['Id'], [
     'PharmacyId' => 9876,
     'DispensableDrugId' => 12345,
     'Quantity' => 30,
@@ -41,7 +41,7 @@ $dosespot->prescriptions()->createCoded($patient['Id'], [
     'Directions' => 'Take one tablet by mouth daily.',
 ]);
 
-$dosespot->prescriptions()->send($patient['Id'], $prescriptionId, pin: '123456');
+$dosespot->prescriptions()->send($patient['Id'], $prescription['Id'], pin: '123456');
 ```
 
 ## Installation
