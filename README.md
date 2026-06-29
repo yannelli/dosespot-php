@@ -75,7 +75,7 @@ use Yannelli\DoseSpot\Environment;
 
 $dosespot = new DoseSpot(new Config(
     clinicId: '12345',
-    clinicKey: $key,
+    clinicKey: getenv('DOSESPOT_CLINIC_KEY'),
     environment: Environment::Staging,
     userId: 67890,
     timeout: 30,
