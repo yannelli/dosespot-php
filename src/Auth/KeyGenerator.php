@@ -7,10 +7,13 @@ namespace Yannelli\DoseSpot\Auth;
 /**
  * Generates the DoseSpot signing key required by the /token endpoint.
  *
- * DoseSpot expects a 32-character base64-encoded value built from a
- * 32-byte random buffer concatenated with the clinic key, then SHA-512
- * hashed. The first character of the random buffer is also used as the
- * base64-encoded password prefix to identify the buffer used.
+ * The output is a 54-character string: the first 22 characters come from
+ * the base64-encoded 32-byte seed, followed by the first 32 characters of
+ * the base64-encoded SHA-512(seed + clinicKey) digest.
+ *
+ * If your DoseSpot deployment expects a different signing algorithm,
+ * subclass this generator (the seam is the public {@see generate()}
+ * method) and pass your custom instance to {@see Authenticator}.
  */
 class KeyGenerator
 {

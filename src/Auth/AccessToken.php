@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yannelli\DoseSpot\Auth;
 
-class AccessToken
+final class AccessToken
 {
     public function __construct(
         public readonly string $token,

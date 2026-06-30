@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yannelli\DoseSpot\Exceptions;
 
-class RateLimitException extends ApiException
+final class RateLimitException extends ApiException
 {
     public function __construct(
         string $message,

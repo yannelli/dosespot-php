@@ -33,23 +33,16 @@ class Pharmacies extends Resource
         ?array $specialty = null,
         ?string $ncpdpID = null,
     ): array {
-        $query = [
+        return $this->get('api/pharmacies/search', [
             'name' => $name,
             'city' => $city,
             'state' => $state,
             'zip' => $zip,
             'address' => $address,
             'phoneOrFax' => $phoneOrFax,
+            'specialty' => $specialty,
             'ncpdpID' => $ncpdpID,
-        ];
-
-        if ($specialty !== null) {
-            foreach (array_values($specialty) as $i => $value) {
-                $query["specialty[{$i}]"] = $value;
-            }
-        }
-
-        return $this->get('api/pharmacies/search', $query);
+        ]);
     }
 
     /**

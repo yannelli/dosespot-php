@@ -54,22 +54,25 @@ it('chooses the staging environment via the static factory', function () {
     $client = DoseSpot::staging(clinicId: '1', clinicKey: 'k');
 
     expect($client->config->environment)->toBe(Environment::Staging);
-    expect($client->config->baseUrl())->toBe('https://my.staging.dosespot.com/webapi');
+    expect($client->config->baseUrl)->toBe('https://my.staging.dosespot.com/webapi');
 });
 
 it('chooses the production environment via the static factory', function () {
     $client = DoseSpot::production(clinicId: '1', clinicKey: 'k');
 
     expect($client->config->environment)->toBe(Environment::Production);
-    expect($client->config->baseUrl())->toBe('https://my.dosespot.com/webapi');
+    expect($client->config->baseUrl)->toBe('https://my.dosespot.com/webapi');
 });
 
-it('clones the client with a different user id', function () {
-    $client = DoseSpot::staging(clinicId: '1', clinicKey: 'k', userId: 10);
+it('clones the client with a different user id and shares the Guzzle handler', function () {
+    $factory = factory();
+    $client = $factory->preauthorizedClient();
 
-    $next = $client->asUser(20);
+    $next = $client->asUser(99);
 
-    expect($client->config->userId)->toBe(10);
-    expect($next->config->userId)->toBe(20);
     expect($next)->not->toBe($client);
+    expect($next->config->userId)->toBe(99);
+
+    $reflection = new ReflectionProperty($client, 'guzzle');
+    expect($reflection->getValue($next))->toBe($reflection->getValue($client));
 });

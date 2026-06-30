@@ -15,7 +15,7 @@ use Yannelli\DoseSpot\Exceptions\NotFoundException;
 use Yannelli\DoseSpot\Exceptions\RateLimitException;
 use Yannelli\DoseSpot\Exceptions\ValidationException;
 
-class HttpClient
+final class HttpClient
 {
     public function __construct(
         private readonly Config $config,

@@ -10,7 +10,7 @@ use GuzzleHttp\RequestOptions;
 use Yannelli\DoseSpot\Config;
 use Yannelli\DoseSpot\Exceptions\AuthenticationException;
 
-class Authenticator
+final class Authenticator
 {
     private ?AccessToken $cachedToken = null;
 
@@ -23,7 +23,7 @@ class Authenticator
 
     public function token(): AccessToken
     {
-        if ($this->cachedToken instanceof AccessToken && ! $this->cachedToken->isExpired()) {
+        if ($this->cachedToken !== null && ! $this->cachedToken->isExpired()) {
             return $this->cachedToken;
         }
 
