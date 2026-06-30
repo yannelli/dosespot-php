@@ -81,6 +81,21 @@ it('throws a RateLimitException on 429 and surfaces Retry-After', function () {
     }
 });
 
+it('parses HTTP-date Retry-After headers on 429 responses', function () {
+    $factory = factory();
+    $retryAt = gmdate('D, d M Y H:i:s \G\M\T', time() + 120);
+    $factory->pushResponse(429, ['Message' => 'slow down'], ['Retry-After' => $retryAt]);
+
+    try {
+        $factory->preauthorizedClient()->general()->check();
+        fail('Expected RateLimitException');
+    } catch (RateLimitException $e) {
+        expect($e->retryAfter())
+            ->toBeGreaterThan(0)
+            ->toBeLessThanOrEqual(120);
+    }
+});
+
 it('throws a generic ApiException on 500-class responses', function () {
     $factory = factory();
     $factory->pushResponse(500, ['Message' => 'boom']);
