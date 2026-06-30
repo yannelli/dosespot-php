@@ -26,11 +26,11 @@ it('searches compounds', function () {
     $factory = factory();
     $factory->pushResponse(200, []);
 
-    $factory->preauthorizedClient()->compounds()->search(name: 'cream', ndc: null);
+    $factory->preauthorizedClient()->compounds()->search(name: 'cream', ndc: '12345');
 
     $uri = (string) $factory->lastRequest()->getUri();
     expect($uri)->toContain('name=cream');
-    expect($uri)->not->toContain('ndc=');
+    expect($uri)->toContain('ndc=12345');
 });
 
 it('searches diagnoses by ICD and CDT', function () {
