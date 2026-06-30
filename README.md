@@ -1,7 +1,7 @@
 # dosespot-php
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/yannelli/dosespot-php.svg?style=flat-square)](https://packagist.org/packages/yannelli/dosespot-php)
-[![Tests](https://img.shields.io/github/actions/workflow/status/yannelli/dosespot-php/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/yannelli/dosespot-php/actions/workflows/run-tests.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/yannelli/dosespot-php/run-tests-pest.yml?branch=main&label=tests&style=flat-square)](https://github.com/yannelli/dosespot-php/actions/workflows/run-tests-pest.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/yannelli/dosespot-php.svg?style=flat-square)](https://packagist.org/packages/yannelli/dosespot-php)
 
 A modern, framework-agnostic PHP client for the
@@ -32,7 +32,7 @@ $patient = $dosespot->patients()->create([
     'Active' => true,
 ]);
 
-$dosespot->prescriptions()->createCoded($patient['Id'], [
+$prescription = $dosespot->prescriptions()->createCoded($patient['Id'], [
     'PharmacyId' => 9876,
     'DispensableDrugId' => 12345,
     'Quantity' => 30,
@@ -41,7 +41,7 @@ $dosespot->prescriptions()->createCoded($patient['Id'], [
     'Directions' => 'Take one tablet by mouth daily.',
 ]);
 
-$dosespot->prescriptions()->send($patient['Id'], $prescriptionId, pin: '123456');
+$dosespot->prescriptions()->send($patient['Id'], $prescription['Id'], pin: '123456');
 ```
 
 ## Installation
@@ -75,7 +75,7 @@ use Yannelli\DoseSpot\Environment;
 
 $dosespot = new DoseSpot(new Config(
     clinicId: '12345',
-    clinicKey: $key,
+    clinicKey: getenv('DOSESPOT_CLINIC_KEY'),
     environment: Environment::Staging,
     userId: 67890,
     timeout: 30,
