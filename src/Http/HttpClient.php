@@ -158,6 +158,18 @@ final class HttpClient
     {
         $header = $response->header('Retry-After');
 
-        return $header === null ? null : (int) $header;
+        if ($header === null) {
+            return null;
+        }
+
+        $header = trim($header);
+
+        if (ctype_digit($header)) {
+            return (int) $header;
+        }
+
+        $timestamp = strtotime($header);
+
+        return $timestamp === false ? null : max(0, $timestamp - time());
     }
 }
