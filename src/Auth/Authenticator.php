@@ -80,9 +80,7 @@ final class Authenticator
         $decoded = json_decode($body, true);
 
         if ($status < 200 || $status >= 300 || ! is_array($decoded) || ! isset($decoded['access_token'])) {
-            $message = is_array($decoded) && isset($decoded['error_description'])
-                ? (string) $decoded['error_description']
-                : ('DoseSpot token request failed with HTTP '.$status);
+            $message = $this->extractErrorMessage($decoded, $status);
 
             throw new AuthenticationException($message, $status);
         }
@@ -95,5 +93,20 @@ final class Authenticator
             expiresAt: time() + $expiresIn,
             userId: isset($decoded['userId']) ? (int) $decoded['userId'] : $this->config->userId,
         );
+    }
+
+    private function extractErrorMessage(mixed $decoded, int $status): string
+    {
+        if (! is_array($decoded)) {
+            return 'DoseSpot token request failed with HTTP '.$status;
+        }
+
+        foreach (['error_description', 'Message', 'error'] as $key) {
+            if (isset($decoded[$key])) {
+                return (string) $decoded[$key];
+            }
+        }
+
+        return 'DoseSpot token request failed with HTTP '.$status;
     }
 }
