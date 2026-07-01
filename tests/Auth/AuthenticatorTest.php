@@ -47,6 +47,24 @@ it('throws an AuthenticationException when the token request fails', function ()
     expect(fn () => $auth->token())->toThrow(AuthenticationException::class, 'bad clinic');
 });
 
+it('surfaces token error values when no error description is present', function () {
+    $factory = factory();
+    $factory->pushResponse(400, ['error' => 'invalid_client']);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())->toThrow(AuthenticationException::class, 'invalid_client');
+});
+
+it('surfaces token message values when no error description is present', function () {
+    $factory = factory();
+    $factory->pushResponse(401, ['Message' => 'clinic unauthorized']);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())->toThrow(AuthenticationException::class, 'clinic unauthorized');
+});
+
 it('refreshes the token after it expires', function () {
     $factory = factory();
     $factory->pushToken('second', 3600);
