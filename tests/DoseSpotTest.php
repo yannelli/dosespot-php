@@ -76,3 +76,20 @@ it('clones the client with a different user id and shares the Guzzle handler', f
     $reflection = new ReflectionProperty($client, 'guzzle');
     expect($reflection->getValue($next))->toBe($reflection->getValue($client));
 });
+
+it('requests a fresh token when switching users', function () {
+    $factory = factory();
+    $client = $factory->preauthorizedClient();
+
+    $factory->pushToken('fresh-user-token');
+    $factory->pushResponse(200, ['Id' => 1]);
+
+    $client->asUser(99)->general()->check();
+
+    $tokenRequest = $factory->history[0]['request'];
+    $apiRequest = $factory->history[1]['request'];
+
+    expect($tokenRequest->getUri()->getPath())->toBe('/webapi/token');
+    expect($tokenRequest->getHeaderLine('X-DoseSpot-UserId'))->toBe('99');
+    expect($apiRequest->getHeaderLine('Authorization'))->toBe('Bearer fresh-user-token');
+});
