@@ -32,16 +32,18 @@ it('serializes booleans, datetimes, and skips nulls in query strings', function 
 
     $client = $factory->preauthorizedClient();
 
-    $client->patients()->search(
-        firstName: 'Jane',
-        lastName: null,
-        dob: new DateTimeImmutable('1990-01-02 03:04:05'),
-    );
+    $client->http->get('api/general/check', [
+        'active' => true,
+        'includeInactive' => false,
+        'requestedAt' => new DateTimeImmutable('1990-01-02 03:04:05'),
+        'ignored' => null,
+    ]);
 
     $uri = (string) $factory->lastRequest()->getUri();
-    expect($uri)->toContain('firstname=Jane');
-    expect($uri)->toContain('dob=1990-01-02T03%3A04%3A05');
-    expect($uri)->not->toContain('lastname=');
+    expect($uri)->toContain('active=true');
+    expect($uri)->toContain('includeInactive=false');
+    expect($uri)->toContain('requestedAt=1990-01-02T03%3A04%3A05');
+    expect($uri)->not->toContain('ignored=');
 });
 
 it('throws a NotFoundException on 404', function () {
