@@ -148,8 +148,13 @@ it('wraps a network-level GuzzleException in an ApiException', function () {
         new ConnectException('Connection timed out', new Request('GET', 'test')),
     );
 
-    expect(fn () => $factory->preauthorizedClient()->general()->check())
-        ->toThrow(ApiException::class, 'Connection timed out');
+    try {
+        $factory->preauthorizedClient()->general()->check();
+        fail('Expected ApiException');
+    } catch (ApiException $e) {
+        expect($e->getMessage())->toContain('Connection timed out');
+        expect($e->getPrevious())->toBeInstanceOf(ConnectException::class);
+    }
 });
 
 it('falls back to the raw body when no known error field is present', function () {

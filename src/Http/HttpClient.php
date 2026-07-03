@@ -72,6 +72,7 @@ final class HttpClient
             throw new ApiException(
                 'HTTP request to DoseSpot failed: '.$e->getMessage(),
                 $e->getCode(),
+                previous: $e,
             );
         }
 
