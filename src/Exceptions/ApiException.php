@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yannelli\DoseSpot\Exceptions;
 
+use Throwable;
+
 class ApiException extends DoseSpotException
 {
     public function __construct(
@@ -11,8 +13,9 @@ class ApiException extends DoseSpotException
         public readonly int $statusCode = 0,
         public readonly ?array $responseBody = null,
         public readonly ?string $rawResponse = null,
+        ?Throwable $previous = null,
     ) {
-        parent::__construct($message, $statusCode);
+        parent::__construct($message, $statusCode, $previous);
     }
 
     public function statusCode(): int
