@@ -46,6 +46,22 @@ it('serializes booleans, datetimes, and skips nulls in query strings', function 
     expect($uri)->not->toContain('ignored=');
 });
 
+it('preserves zero-like query values', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->http->get('api/general/check', [
+        'page' => 0,
+        'search' => '0',
+    ]);
+
+    $uri = (string) $factory->lastRequest()->getUri();
+    expect($uri)->toContain('page=0');
+    expect($uri)->toContain('search=0');
+});
+
 it('throws a NotFoundException on 404', function () {
     $factory = factory();
     $factory->pushResponse(404, ['Message' => 'patient not found']);
