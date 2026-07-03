@@ -65,6 +65,15 @@ it('surfaces token message values when no error description is present', functio
     expect(fn () => $auth->token())->toThrow(AuthenticationException::class, 'clinic unauthorized');
 });
 
+it('surfaces token result descriptions when present', function () {
+    $factory = factory();
+    $factory->pushResponse(400, ['Result' => ['ResultDescription' => 'clinic key rejected']]);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())->toThrow(AuthenticationException::class, 'clinic key rejected');
+});
+
 it('refreshes the token after it expires', function () {
     $factory = factory();
     $factory->pushToken('second', 3600);

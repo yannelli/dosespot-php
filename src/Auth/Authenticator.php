@@ -101,6 +101,10 @@ final class Authenticator
             return 'DoseSpot token request failed with HTTP '.$status;
         }
 
+        if (isset($decoded['Result']['ResultDescription'])) {
+            return (string) $decoded['Result']['ResultDescription'];
+        }
+
         foreach (['error_description', 'Message', 'error'] as $key) {
             if (isset($decoded[$key])) {
                 return (string) $decoded[$key];
