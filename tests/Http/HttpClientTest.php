@@ -134,6 +134,14 @@ it('throws a generic ApiException on 500-class responses', function () {
         ->toThrow(ApiException::class, 'boom');
 });
 
+it('surfaces OAuth-style error descriptions from API responses', function () {
+    $factory = factory();
+    $factory->pushResponse(500, ['error' => 'server_error', 'error_description' => 'temporarily unavailable']);
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(ApiException::class, 'temporarily unavailable');
+});
+
 it('throws an AuthenticationException on 403', function () {
     $factory = factory();
     $factory->pushResponse(403, ['Message' => 'forbidden']);
