@@ -33,13 +33,21 @@ it('requires a clinic id and clinic key', function () {
 });
 
 it('clones with a new user id and preserves a custom base URL', function () {
-    $config = new Config(clinicId: '1', clinicKey: 'k', baseUrl: 'https://example.test/webapi');
+    $config = new Config(
+        clinicId: '1',
+        clinicKey: 'k',
+        timeout: 15,
+        connectTimeout: 5,
+        baseUrl: 'https://example.test/webapi',
+    );
 
     $next = $config->withUserId(99);
 
     expect($config->userId)->toBeNull();
     expect($next->userId)->toBe(99);
     expect($next->baseUrl)->toBe('https://example.test/webapi');
+    expect($next->timeout)->toBe(15);
+    expect($next->connectTimeout)->toBe(5);
 });
 
 it('rejects non-positive timeouts', function () {
