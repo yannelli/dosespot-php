@@ -70,3 +70,47 @@ it('changes pharmacy via query string', function () {
     expect($uri->getPath())->toBe('/webapi/api/patients/5/prescriptions/99/changePharmacy');
     expect($uri->getQuery())->toContain('pharmacyId=42');
 });
+
+it('marks a prescription as printed, with and without a pin', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->prescriptions()->setPrinted(5, 99);
+    expect($factory->history[0]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/setPrinted');
+
+    $client->prescriptions()->setPrinted(5, 99, pin: '654321');
+    expect($factory->history[1]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/setPrinted/654321');
+});
+
+it('marks multiple prescriptions as ready to sign', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->prescriptions()->readyToSign(5, [10, 20, 30]);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/readyToSign');
+    expect(json_decode((string) $request->getBody(), true))
+        ->toBe(['PrescriptionIds' => [10, 20, 30]]);
+});
+
+it('bulk-deletes prescriptions via DELETE with a JSON body', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->prescriptions()->destroyBulk(5, [1, 2]);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('DELETE');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/delete');
+    expect(json_decode((string) $request->getBody(), true))
+        ->toBe(['PrescriptionIds' => [1, 2]]);
+});
