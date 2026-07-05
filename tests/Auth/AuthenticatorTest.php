@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Psr7\Request;
 use Yannelli\DoseSpot\Auth\AccessToken;
 use Yannelli\DoseSpot\Auth\Authenticator;
 use Yannelli\DoseSpot\Exceptions\AuthenticationException;
@@ -45,6 +47,23 @@ it('throws an AuthenticationException when the token request fails', function ()
     $auth = new Authenticator($factory->config(), $factory->guzzle());
 
     expect(fn () => $auth->token())->toThrow(AuthenticationException::class, 'bad clinic');
+});
+
+it('preserves network exceptions from token requests', function () {
+    $factory = factory();
+    $factory->mockHandler->append(
+        new ConnectException('Connection timed out', new Request('POST', 'token')),
+    );
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    try {
+        $auth->token();
+        fail('Expected AuthenticationException');
+    } catch (AuthenticationException $e) {
+        expect($e->getMessage())->toContain('Connection timed out');
+        expect($e->getPrevious())->toBeInstanceOf(ConnectException::class);
+    }
 });
 
 it('surfaces token error values when no error description is present', function () {
