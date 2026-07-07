@@ -37,6 +37,66 @@ it('replaces a coded self-reported medication via PUT', function () {
         ->toBe('/webapi/api/patients/5/selfReportedMedications/coded/17');
 });
 
+it('updates a coded self-reported medication via POST', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->selfReportedMedications()
+        ->updateCoded(5, 17, ['DispensableDrugId' => 3]);
+
+    expect($factory->lastRequest()->getMethod())->toBe('POST');
+    expect($factory->lastRequest()->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/selfReportedMedications/coded/17');
+});
+
+it('replaces a simple self-reported medication via PUT', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->selfReportedMedications()
+        ->replaceSimple(5, 17, ['Name' => 'ibuprofen']);
+
+    expect($factory->lastRequest()->getMethod())->toBe('PUT');
+    expect($factory->lastRequest()->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/selfReportedMedications/simple/17');
+});
+
+it('updates a simple self-reported medication via POST', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->selfReportedMedications()
+        ->updateSimple(5, 17, ['Name' => 'ibuprofen (updated)']);
+
+    expect($factory->lastRequest()->getMethod())->toBe('POST');
+    expect($factory->lastRequest()->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/selfReportedMedications/simple/17');
+});
+
+it('replaces a freetext self-reported medication via PUT', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->selfReportedMedications()
+        ->replaceFreetext(5, 17, ['DisplayName' => 'aspirin']);
+
+    expect($factory->lastRequest()->getMethod())->toBe('PUT');
+    expect($factory->lastRequest()->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/selfReportedMedications/freetext/17');
+});
+
+it('updates a freetext self-reported medication via POST', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->selfReportedMedications()
+        ->updateFreetext(5, 17, ['DisplayName' => 'aspirin (updated)']);
+
+    expect($factory->lastRequest()->getMethod())->toBe('POST');
+    expect($factory->lastRequest()->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/selfReportedMedications/freetext/17');
+});
+
 it('updates a self-reported medication status', function () {
     $factory = factory();
     $factory->pushResponse(200, []);
