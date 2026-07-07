@@ -18,6 +18,16 @@ it('serializes specialty lists with array-style keys', function () {
     expect($uri)->toContain('city=Austin');
 });
 
+it('retrieves a pharmacy by id', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 42, 'Name' => 'CVS']);
+
+    $factory->preauthorizedClient()->pharmacies()->find(42);
+
+    expect((string) $factory->lastRequest()->getUri())
+        ->toBe('https://my.staging.dosespot.com/webapi/api/pharmacies/42');
+});
+
 it('adds and removes a pharmacy from a patient', function () {
     $factory = factory();
     $factory->pushResponse(200, []);
