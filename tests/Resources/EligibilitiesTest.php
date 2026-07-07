@@ -46,3 +46,19 @@ it('queries prescription benefits', function () {
     expect($uri)->toContain('patientEligibilityId=12');
     expect($uri)->toContain('pharmacyId=9876');
 });
+
+it('queries the formulary for a patient eligibility and ndc', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->eligibilities()->formulary(
+        patientId: 5,
+        patientEligibilityId: 12,
+        ndc: '00378511005',
+    );
+
+    $uri = (string) $factory->lastRequest()->getUri();
+    expect($uri)->toContain('/api/patients/5/formulary');
+    expect($uri)->toContain('patientEligibilityId=12');
+    expect($uri)->toContain('ndc=00378511005');
+});
