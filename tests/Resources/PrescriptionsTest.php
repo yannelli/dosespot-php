@@ -114,3 +114,123 @@ it('bulk-deletes prescriptions via DELETE with a JSON body', function () {
     expect(json_decode((string) $request->getBody(), true))
         ->toBe(['PrescriptionIds' => [1, 2]]);
 });
+
+it('retrieves a prescription by id', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 99]);
+
+    $factory->preauthorizedClient()->prescriptions()->find(5, 99);
+
+    expect($factory->lastRequest()->getMethod())->toBe('GET');
+    expect($factory->lastRequest()->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99');
+});
+
+it('retrieves EPCS suggestions for a prescription', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $factory->preauthorizedClient()->prescriptions()->epcsSuggestions(5, 99);
+
+    expect($factory->lastRequest()->getMethod())->toBe('GET');
+    expect($factory->lastRequest()->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/epcsSuggestions');
+});
+
+it('retrieves the prescription log', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $factory->preauthorizedClient()->prescriptions()->log(5, 99);
+
+    expect($factory->lastRequest()->getMethod())->toBe('GET');
+    expect($factory->lastRequest()->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/log');
+});
+
+it('updates a coded prescription', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 99]);
+
+    $factory->preauthorizedClient()->prescriptions()->updateCoded(5, 99, ['Quantity' => 60]);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/coded/99');
+    expect(json_decode((string) $request->getBody(), true))->toBe(['Quantity' => 60]);
+});
+
+it('creates an NDC prescription', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 100]);
+
+    $factory->preauthorizedClient()->prescriptions()->createNdc(5, ['NDC' => '12345-678-90']);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/ndc');
+});
+
+it('copies a prescription', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 200]);
+
+    $factory->preauthorizedClient()->prescriptions()->copy(5, 99);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/copy');
+});
+
+it('ignores a prescription error', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->prescriptions()->ignoreError(5, 99);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/ignoreError');
+});
+
+it('updates a prescription status', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->prescriptions()->updateStatus(5, 99, ['Status' => 2]);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/updateStatus');
+    expect(json_decode((string) $request->getBody(), true))->toBe(['Status' => 2]);
+});
+
+it('sends an EPCS prescription', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->prescriptions()->sendEpcs(5, 99, ['TransactionId' => 'abc']);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/sendEpcs');
+    expect(json_decode((string) $request->getBody(), true))->toBe(['TransactionId' => 'abc']);
+});
+
+it('cancels a prescription on behalf of another clinician', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->prescriptions()->cancelOnBehalfOf(5, 99, 77, ['Reason' => 'wrong']);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/cancelOnBehalfOf/77');
+});
