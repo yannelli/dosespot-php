@@ -317,3 +317,48 @@ it('sends EPCS prescriptions in bulk', function () {
         'TransactionId' => 'tx-abc',
     ]);
 });
+
+
+it('creates and updates compound, compiled-compound, supply, and freetext prescriptions', function () {
+    $factory = factory();
+    for ($i = 0; $i < 8; $i++) {
+        $factory->pushResponse(200, ['Id' => 100 + $i]);
+    }
+
+    $client = $factory->preauthorizedClient();
+    $payload = ['Quantity' => 30];
+
+    $client->prescriptions()->createCompound(5, $payload);
+    $client->prescriptions()->updateCompound(5, 91, $payload);
+    $client->prescriptions()->createCompiledCompound(5, $payload);
+    $client->prescriptions()->updateCompiledCompound(5, 92, $payload);
+    $client->prescriptions()->createSupply(5, $payload);
+    $client->prescriptions()->updateSupply(5, 93, $payload);
+    $client->prescriptions()->createFreetext(5, $payload);
+    $client->prescriptions()->updateFreetext(5, 94, $payload);
+
+    $paths = array_map(
+        fn ($entry) => $entry['request']->getUri()->getPath(),
+        $factory->history,
+    );
+    $methods = array_map(
+        fn ($entry) => $entry['request']->getMethod(),
+        $factory->history,
+    );
+
+    expect($methods)->toBe(['POST', 'POST', 'POST', 'POST', 'POST', 'POST', 'POST', 'POST']);
+    expect($paths)->toBe([
+        '/webapi/api/patients/5/prescriptions/compound',
+        '/webapi/api/patients/5/prescriptions/compound/91',
+        '/webapi/api/patients/5/prescriptions/compiledcompound',
+        '/webapi/api/patients/5/prescriptions/compiledcompound/92',
+        '/webapi/api/patients/5/prescriptions/supply',
+        '/webapi/api/patients/5/prescriptions/supply/93',
+        '/webapi/api/patients/5/prescriptions/freetext',
+        '/webapi/api/patients/5/prescriptions/freetext/94',
+    ]);
+
+    foreach ($factory->history as $entry) {
+        expect(json_decode((string) $entry['request']->getBody(), true))->toBe($payload);
+    }
+});
