@@ -234,3 +234,86 @@ it('cancels a prescription on behalf of another clinician', function () {
     expect($request->getUri()->getPath())
         ->toBe('/webapi/api/patients/5/prescriptions/99/cancelOnBehalfOf/77');
 });
+
+it('sends a prescription on behalf of another clinician, with and without a pin', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->prescriptions()->sendOnBehalfOf(5, 99, 77);
+    expect($factory->history[0]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/sendOnBehalfOf/77');
+
+    $client->prescriptions()->sendOnBehalfOf(5, 99, 77, pin: '9999');
+    expect($factory->history[1]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/sendOnBehalfOf/77/9999');
+});
+
+it('sends prescriptions in bulk with and without a pin', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->prescriptions()->sendBulk(5, [1, 2, 3]);
+    $request = $factory->history[0]['request'];
+    expect($request->getUri()->getPath())->toBe('/webapi/api/patients/5/prescriptions/send');
+    expect(json_decode((string) $request->getBody(), true))->toBe(['PrescriptionIds' => [1, 2, 3]]);
+
+    $client->prescriptions()->sendBulk(5, [1, 2], pin: '4242');
+    expect($factory->history[1]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/send/4242');
+});
+
+it('marks multiple prescriptions as printed in bulk with and without a pin', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->prescriptions()->setPrintedBulk(5, [10, 20]);
+    $request = $factory->history[0]['request'];
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/setPrinted');
+    expect(json_decode((string) $request->getBody(), true))->toBe(['PrescriptionIds' => [10, 20]]);
+
+    $client->prescriptions()->setPrintedBulk(5, [10], pin: '7777');
+    expect($factory->history[1]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/setPrinted/7777');
+});
+
+it('updates an NDC prescription', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 101]);
+
+    $factory->preauthorizedClient()->prescriptions()->updateNdc(5, 101, ['NDC' => '54321-678-90']);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/ndc/101');
+    expect(json_decode((string) $request->getBody(), true))->toBe(['NDC' => '54321-678-90']);
+});
+
+it('sends EPCS prescriptions in bulk', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->prescriptions()->sendEpcsBulk(5, [
+        'PrescriptionIds' => [1, 2],
+        'TransactionId' => 'tx-abc',
+    ]);
+
+    $request = $factory->lastRequest();
+    expect($request->getMethod())->toBe('POST');
+    expect($request->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/sendEpcs');
+    expect(json_decode((string) $request->getBody(), true))->toBe([
+        'PrescriptionIds' => [1, 2],
+        'TransactionId' => 'tx-abc',
+    ]);
+});
