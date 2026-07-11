@@ -142,3 +142,73 @@ it('sets and changes pin', function () {
     expect($factory->history[1]['request']->getUri()->getPath())
         ->toBe('/webapi/api/clinicians/changePin');
 });
+
+it('initializes and runs the idp challenge flow', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['SessionId' => 'sess-1']);
+    $factory->pushResponse(200, ['Questions' => []]);
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+    $client->clinicians()->initIdp(5, ['RedirectUrl' => 'https://example.test/callback']);
+    $client->clinicians()->idp(['SessionId' => 'sess-1']);
+    $client->clinicians()->submitIdpAnswers(['SessionId' => 'sess-1', 'Answers' => ['A']]);
+    $client->clinicians()->submitIdpOtp(['SessionId' => 'sess-1', 'Otp' => '123456']);
+
+    expect($factory->history[0]['request']->getMethod())->toBe('POST');
+    expect($factory->history[0]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/clinicians/5/initIdp');
+    expect(json_decode((string) $factory->history[0]['request']->getBody(), true))
+        ->toBe(['RedirectUrl' => 'https://example.test/callback']);
+
+    expect($factory->history[1]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/clinicians/idp');
+    expect(json_decode((string) $factory->history[1]['request']->getBody(), true))
+        ->toBe(['SessionId' => 'sess-1']);
+
+    expect($factory->history[2]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/clinicians/idpAnswers');
+    expect(json_decode((string) $factory->history[2]['request']->getBody(), true))
+        ->toBe(['SessionId' => 'sess-1', 'Answers' => ['A']]);
+
+    expect($factory->history[3]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/clinicians/idpOtp');
+    expect(json_decode((string) $factory->history[3]['request']->getBody(), true))
+        ->toBe(['SessionId' => 'sess-1', 'Otp' => '123456']);
+});
+
+it('requests duo activation, initializes tfa steps, and resyncs a token', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['ActivationCode' => 'duo-1']);
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+    $client->clinicians()->requestDuoMobileActivation(['ClinicianId' => 5]);
+    $client->clinicians()->initTfaActivate(5, ['Device' => 'phone']);
+    $client->clinicians()->initTfaDeactivate(5, ['Reason' => 'lost']);
+    $client->clinicians()->resyncToken(['ClinicianId' => 5, 'Token' => '987654']);
+
+    expect($factory->history[0]['request']->getMethod())->toBe('POST');
+    expect($factory->history[0]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/clinicians/requestDuoMobileActivation');
+    expect(json_decode((string) $factory->history[0]['request']->getBody(), true))
+        ->toBe(['ClinicianId' => 5]);
+
+    expect($factory->history[1]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/clinicians/5/initTfaActivate');
+    expect(json_decode((string) $factory->history[1]['request']->getBody(), true))
+        ->toBe(['Device' => 'phone']);
+
+    expect($factory->history[2]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/clinicians/5/initTfaDeactivate');
+    expect(json_decode((string) $factory->history[2]['request']->getBody(), true))
+        ->toBe(['Reason' => 'lost']);
+
+    expect($factory->history[3]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/clinicians/resyncToken');
+    expect(json_decode((string) $factory->history[3]['request']->getBody(), true))
+        ->toBe(['ClinicianId' => 5, 'Token' => '987654']);
+});
