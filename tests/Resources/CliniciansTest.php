@@ -24,6 +24,30 @@ it('looks up a clinician by npi and dea', function () {
     expect($uri)->toContain('dea=AB1234567');
 });
 
+it('looks up a clinician with optional filters and omits null query params', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->clinicians()->lookup(npi: '1234567893');
+    $uri = (string) $factory->history[0]['request']->getUri();
+    expect($uri)->toContain('/api/clinician');
+    expect($uri)->toContain('npi=1234567893');
+    expect($uri)->not->toContain('dea=');
+
+    $client->clinicians()->lookup(dea: 'AB1234567');
+    $uri = (string) $factory->history[1]['request']->getUri();
+    expect($uri)->toContain('dea=AB1234567');
+    expect($uri)->not->toContain('npi=');
+
+    $client->clinicians()->lookup();
+    expect((string) $factory->history[2]['request']->getUri())
+        ->toBe('https://my.staging.dosespot.com/webapi/api/clinician');
+});
+
 it('finds, creates, patches, and replaces a clinician', function () {
     $factory = factory();
     $factory->pushResponse(200, ['Id' => 5]);
