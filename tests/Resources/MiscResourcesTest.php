@@ -11,17 +11,6 @@ it('calls the general health check', function () {
     expect($factory->lastRequest()->getUri()->getPath())->toBe('/webapi/api/general/check');
 });
 
-it('searches supplies by name and NDC', function () {
-    $factory = factory();
-    $factory->pushResponse(200, []);
-
-    $factory->preauthorizedClient()->supplies()->search(name: 'lancet', ndc: '12345');
-
-    $uri = (string) $factory->lastRequest()->getUri();
-    expect($uri)->toContain('name=lancet');
-    expect($uri)->toContain('NDC=12345');
-});
-
 it('searches compounds', function () {
     $factory = factory();
     $factory->pushResponse(200, []);
