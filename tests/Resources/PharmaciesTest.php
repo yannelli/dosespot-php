@@ -43,3 +43,35 @@ it('adds and removes a pharmacy from a patient', function () {
     $client->pharmacies()->removeFromPatient(5, 42);
     expect($factory->history[1]['request']->getMethod())->toBe('DELETE');
 });
+
+it('searches pharmacies with optional filters and omits null query params', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->pharmacies()->search(
+        name: 'CVS',
+        city: 'Austin',
+        state: 'TX',
+        zip: '78701',
+        address: '1 Congress Ave',
+        phoneOrFax: '5125550100',
+        ncpdpID: '1234567',
+    );
+
+    $uri = (string) $factory->history[0]['request']->getUri();
+    expect($uri)->toContain('name=CVS')
+        ->and($uri)->toContain('city=Austin')
+        ->and($uri)->toContain('state=TX')
+        ->and($uri)->toContain('zip=78701')
+        ->and($uri)->toContain('address=1%20Congress%20Ave')
+        ->and($uri)->toContain('phoneOrFax=5125550100')
+        ->and($uri)->toContain('ncpdpID=1234567')
+        ->and($uri)->not->toContain('specialty');
+
+    $client->pharmacies()->search();
+    expect((string) $factory->history[1]['request']->getUri())
+        ->toBe('https://my.staging.dosespot.com/webapi/api/pharmacies/search');
+});
