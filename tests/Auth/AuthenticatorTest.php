@@ -6,6 +6,8 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use Yannelli\DoseSpot\Auth\AccessToken;
 use Yannelli\DoseSpot\Auth\Authenticator;
+use Yannelli\DoseSpot\Config;
+use Yannelli\DoseSpot\Environment;
 use Yannelli\DoseSpot\Exceptions\AuthenticationException;
 
 it('requests a token using the password grant and caches it', function () {
@@ -122,4 +124,20 @@ it('forgets a cached token on demand', function () {
     $auth->forget();
 
     expect($auth->token()->token)->toBe('second');
+});
+
+it('omits the user id header when config has no user id', function () {
+    $factory = factory();
+    $factory->pushToken();
+
+    $config = new Config(
+        clinicId: '12345',
+        clinicKey: 'super-secret-clinic-key-1234567890',
+        environment: Environment::Staging,
+    );
+
+    (new Authenticator($config, $factory->guzzle()))->token();
+
+    $request = $factory->lastRequest();
+    expect($request->hasHeader('X-DoseSpot-UserId'))->toBeFalse();
 });
