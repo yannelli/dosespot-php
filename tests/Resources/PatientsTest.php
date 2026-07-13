@@ -202,3 +202,52 @@ it('sets insurance for a patient', function () {
     expect($request->getMethod())->toBe('POST');
     expect($request->getUri()->getPath())->toBe('/webapi/api/patients/5/insurance');
 });
+it('lists patient prescriptions with DateTime filters and omits null dates', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->patients()->prescriptions(
+        patientId: 5,
+        startDate: new DateTimeImmutable('2026-01-01 08:30:00'),
+    );
+
+    $uriWithStart = (string) $factory->history[0]['request']->getUri();
+    expect($uriWithStart)->toContain('/api/patients/5/prescriptions');
+    expect($uriWithStart)->toContain('startDate=2026-01-01T08%3A30%3A00');
+    expect($uriWithStart)->not->toContain('endDate=');
+
+    $client->patients()->prescriptions(patientId: 5);
+
+    $uriWithoutFilters = (string) $factory->history[1]['request']->getUri();
+    expect($uriWithoutFilters)->toBe('https://my.staging.dosespot.com/webapi/api/patients/5/prescriptions');
+    expect($uriWithoutFilters)->not->toContain('startDate=');
+    expect($uriWithoutFilters)->not->toContain('endDate=');
+});
+
+it('lists self-reported medications with DateTime filters and omits null dates', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->patients()->selfReportedMedications(
+        patientId: 5,
+        endDate: new DateTimeImmutable('2026-06-01 17:45:00'),
+    );
+
+    $uriWithEnd = (string) $factory->history[0]['request']->getUri();
+    expect($uriWithEnd)->toContain('/api/patients/5/selfReportedMedications');
+    expect($uriWithEnd)->toContain('endDate=2026-06-01T17%3A45%3A00');
+    expect($uriWithEnd)->not->toContain('startDate=');
+
+    $client->patients()->selfReportedMedications(patientId: 5);
+
+    $uriWithoutFilters = (string) $factory->history[1]['request']->getUri();
+    expect($uriWithoutFilters)->toBe('https://my.staging.dosespot.com/webapi/api/patients/5/selfReportedMedications');
+    expect($uriWithoutFilters)->not->toContain('startDate=');
+    expect($uriWithoutFilters)->not->toContain('endDate=');
+});
