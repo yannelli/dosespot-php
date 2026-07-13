@@ -48,3 +48,26 @@ it('fetches errors by client with date range', function () {
     expect($uri)->toContain('startDate=2026-01-01T00%3A00%3A00');
     expect($uri)->toContain('endDate=2026-06-01');
 });
+
+it('fetches errors by client with optional filters and omits null query params', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->notifications()->errorsByClient(
+        startDate: new DateTimeImmutable('2026-03-15 12:30:00'),
+    );
+    $client->notifications()->errorsByClient();
+
+    $uriWithStart = (string) $factory->history[0]['request']->getUri();
+    expect($uriWithStart)->toContain('/api/notifications/errorsByClient');
+    expect($uriWithStart)->toContain('startDate=2026-03-15T12%3A30%3A00');
+    expect($uriWithStart)->not->toContain('endDate=');
+
+    $uriWithoutFilters = (string) $factory->history[1]['request']->getUri();
+    expect($uriWithoutFilters)->toBe('https://my.staging.dosespot.com/webapi/api/notifications/errorsByClient');
+    expect($uriWithoutFilters)->not->toContain('startDate=');
+    expect($uriWithoutFilters)->not->toContain('endDate=');
+});
