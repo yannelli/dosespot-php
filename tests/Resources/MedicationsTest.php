@@ -99,3 +99,31 @@ it('selects a medication without optional strength and omits nulls', function ()
     expect($uri)->toContain('Name=lisinopril');
     expect($uri)->not->toContain('Strength=');
 });
+
+it('fetches medication history with optional filters and omits null query params', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->medications()->history(
+        patientId: 99,
+        end: new DateTimeImmutable('2026-06-01 17:45:00'),
+        onBehalfOfUserId: 77,
+    );
+
+    $uriWithPartial = (string) $factory->history[0]['request']->getUri();
+    expect($uriWithPartial)->toContain('/api/patients/99/medications/history');
+    expect($uriWithPartial)->toContain('end=2026-06-01T17%3A45%3A00');
+    expect($uriWithPartial)->toContain('onBehalfOfUserId=77');
+    expect($uriWithPartial)->not->toContain('start=');
+
+    $client->medications()->history(patientId: 99);
+
+    $uriWithoutFilters = (string) $factory->history[1]['request']->getUri();
+    expect($uriWithoutFilters)->toBe('https://my.staging.dosespot.com/webapi/api/patients/99/medications/history');
+    expect($uriWithoutFilters)->not->toContain('start=');
+    expect($uriWithoutFilters)->not->toContain('end=');
+    expect($uriWithoutFilters)->not->toContain('onBehalfOfUserId=');
+});
