@@ -141,3 +141,48 @@ it('omits the user id header when config has no user id', function () {
     $request = $factory->lastRequest();
     expect($request->hasHeader('X-DoseSpot-UserId'))->toBeFalse();
 });
+
+it('prefers userId from the token response over the config value', function () {
+    $factory = factory();
+    $factory->pushResponse(200, [
+        'access_token' => 'response-user-token',
+        'token_type' => 'bearer',
+        'expires_in' => 3600,
+        'userId' => 777,
+    ]);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+    $token = $auth->token();
+
+    expect($token->token)->toBe('response-user-token');
+    expect($token->userId)->toBe(777);
+    expect($factory->config()->userId)->toBe(42);
+});
+
+it('falls back to the configured user id when the token response omits userId', function () {
+    $factory = factory();
+    $factory->pushToken('config-user-token');
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+    $token = $auth->token();
+
+    expect($token->token)->toBe('config-user-token');
+    expect($token->userId)->toBe(42);
+});
+
+it('leaves userId null when neither the response nor config provides one', function () {
+    $factory = factory();
+    $factory->pushToken('no-user-token');
+
+    $config = new Config(
+        clinicId: '12345',
+        clinicKey: 'super-secret-clinic-key-1234567890',
+        environment: Environment::Staging,
+    );
+
+    $auth = new Authenticator($config, $factory->guzzle());
+    $token = $auth->token();
+
+    expect($token->token)->toBe('no-user-token');
+    expect($token->userId)->toBeNull();
+});
