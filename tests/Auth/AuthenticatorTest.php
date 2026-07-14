@@ -186,3 +186,22 @@ it('leaves userId null when neither the response nor config provides one', funct
     expect($token->token)->toBe('no-user-token');
     expect($token->userId)->toBeNull();
 });
+
+it('defaults token_type to Bearer and expires_in to 3600 when omitted', function () {
+    $factory = factory();
+    $factory->pushResponse(200, [
+        'access_token' => 'minimal-token',
+    ]);
+
+    $before = time();
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+    $token = $auth->token();
+    $after = time();
+
+    expect($token->token)->toBe('minimal-token');
+    expect($token->tokenType)->toBe('Bearer');
+    expect($token->authorizationHeader())->toBe('Bearer minimal-token');
+    expect($token->expiresAt)->toBeGreaterThanOrEqual($before + 3600);
+    expect($token->expiresAt)->toBeLessThanOrEqual($after + 3600);
+    expect($token->isExpired())->toBeFalse();
+});
