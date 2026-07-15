@@ -11,6 +11,7 @@ it('searches compounds by name', function () {
     $uri = (string) $factory->lastRequest()->getUri();
     expect($uri)->toContain('api/compounds/search');
     expect($uri)->toContain('name=Acetaminophen');
+    expect($uri)->not->toContain('ndc=');
 });
 
 it('searches compounds by ndc', function () {
@@ -22,6 +23,7 @@ it('searches compounds by ndc', function () {
     $uri = (string) $factory->lastRequest()->getUri();
     expect($uri)->toContain('api/compounds/search');
     expect($uri)->toContain('ndc=12345-678-90');
+    expect($uri)->not->toContain('name=');
 });
 
 it('searches compounds with both name and ndc', function () {
@@ -38,7 +40,7 @@ it('searches compounds with both name and ndc', function () {
     expect($uri)->toContain('ndc=98765-432-10');
 });
 
-it('searches compounds with no filters', function () {
+it('searches compounds with no filters and omits null query params', function () {
     $factory = factory();
     $factory->pushResponse(200, ['Items' => []]);
 
@@ -46,4 +48,6 @@ it('searches compounds with no filters', function () {
 
     $uri = (string) $factory->lastRequest()->getUri();
     expect($uri)->toContain('api/compounds/search');
+    expect($uri)->not->toContain('name=');
+    expect($uri)->not->toContain('ndc=');
 });
