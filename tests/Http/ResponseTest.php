@@ -71,3 +71,29 @@ it('returns null when a header is absent', function () {
 
     expect($response->header('Retry-After'))->toBeNull();
 });
+
+it('caches the raw body across multiple reads of a non-seekable stream', function () {
+    $stream = \GuzzleHttp\Psr7\Utils::streamFor('{"Message": "boom"}');
+    $stream = new \GuzzleHttp\Psr7\NoSeekStream($stream);
+    $response = new Response(new GuzzleResponse(500, [], $stream));
+
+    expect($response->body())->toBe('{"Message": "boom"}');
+    // Without body caching, a second cast of the consumed non-seekable stream is empty.
+    expect($response->body())->toBe('{"Message": "boom"}');
+    expect($response->json())->toBe(['Message' => 'boom']);
+});
+
+it('keeps body available for json after body is read first', function () {
+    $stream = new \GuzzleHttp\Psr7\NoSeekStream(
+        \GuzzleHttp\Psr7\Utils::streamFor('{"Message": "patient not found"}'),
+    );
+    $response = new Response(new GuzzleResponse(404, [], $stream));
+
+    // Matches HttpClient::throwForStatus, which reads body() before json().
+    $rawBody = $response->body();
+    $decoded = $response->json();
+
+    expect($rawBody)->toBe('{"Message": "patient not found"}');
+    expect($decoded)->toBe(['Message' => 'patient not found']);
+    expect($response->body())->toBe($rawBody);
+});
