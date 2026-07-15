@@ -10,6 +10,8 @@ final class Response
 {
     private ?array $decoded = null;
 
+    private ?string $body = null;
+
     public function __construct(public readonly ResponseInterface $raw)
     {
     }
@@ -21,7 +23,11 @@ final class Response
 
     public function body(): string
     {
-        return (string) $this->raw->getBody();
+        if ($this->body !== null) {
+            return $this->body;
+        }
+
+        return $this->body = (string) $this->raw->getBody();
     }
 
     public function json(): array
