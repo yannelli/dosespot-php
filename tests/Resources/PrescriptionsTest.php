@@ -26,17 +26,24 @@ it('sends a prescription with a PIN', function () {
         ->toBe('/webapi/api/patients/5/prescriptions/99/send/123456');
 });
 
-it('sends prescriptions in bulk on behalf of another clinician', function () {
+it('sends prescriptions in bulk on behalf of another clinician, with and without a pin', function () {
     $factory = factory();
     $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
 
-    $factory->preauthorizedClient()->prescriptions()
-        ->sendBulkOnBehalfOf(5, 77, [1, 2, 3]);
+    $client = $factory->preauthorizedClient();
 
-    $request = $factory->lastRequest();
+    $client->prescriptions()->sendBulkOnBehalfOf(5, 77, [1, 2, 3]);
+    $request = $factory->history[0]['request'];
     expect($request->getUri()->getPath())
         ->toBe('/webapi/api/patients/5/prescriptions/sendOnBehalfOf/77');
     expect(json_decode((string) $request->getBody(), true))->toBe(['PrescriptionIds' => [1, 2, 3]]);
+
+    $client->prescriptions()->sendBulkOnBehalfOf(5, 77, [4, 5], pin: '1357');
+    $requestWithPin = $factory->history[1]['request'];
+    expect($requestWithPin->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/sendOnBehalfOf/77/1357');
+    expect(json_decode((string) $requestWithPin->getBody(), true))->toBe(['PrescriptionIds' => [4, 5]]);
 });
 
 it('cancels a prescription', function () {
