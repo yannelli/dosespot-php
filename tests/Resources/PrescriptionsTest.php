@@ -16,13 +16,19 @@ it('creates a coded prescription', function () {
     expect($request->getUri()->getPath())->toBe('/webapi/api/patients/5/prescriptions/coded');
 });
 
-it('sends a prescription with a PIN', function () {
+it('sends a prescription with and without a pin', function () {
     $factory = factory();
     $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
 
-    $factory->preauthorizedClient()->prescriptions()->send(5, 99, pin: '123456');
+    $client = $factory->preauthorizedClient();
 
-    expect($factory->lastRequest()->getUri()->getPath())
+    $client->prescriptions()->send(5, 99);
+    expect($factory->history[0]['request']->getUri()->getPath())
+        ->toBe('/webapi/api/patients/5/prescriptions/99/send');
+
+    $client->prescriptions()->send(5, 99, pin: '123456');
+    expect($factory->history[1]['request']->getUri()->getPath())
         ->toBe('/webapi/api/patients/5/prescriptions/99/send/123456');
 });
 
