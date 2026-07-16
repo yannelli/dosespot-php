@@ -96,6 +96,21 @@ it('searches patients with only some filters and skips nulls', function () {
     expect($uri)->not->toContain('dob=');
 });
 
+it('searches patients with no filters and omits null query params', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $factory->preauthorizedClient()->patients()->search();
+
+    $uri = (string) $factory->lastRequest()->getUri();
+    expect($uri)->toBe('https://my.staging.dosespot.com/webapi/api/patients/search');
+    expect($uri)->not->toContain('firstname=');
+    expect($uri)->not->toContain('lastname=');
+    expect($uri)->not->toContain('dob=');
+    expect($uri)->not->toContain('status=');
+    expect($uri)->not->toContain('pageNumber=');
+});
+
 it('retrieves patient details', function () {
     $factory = factory();
     $factory->pushResponse(200, ['Id' => 5, 'Details' => []]);
