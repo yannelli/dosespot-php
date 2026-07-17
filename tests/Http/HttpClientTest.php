@@ -62,6 +62,24 @@ it('preserves zero-like query values', function () {
     expect($uri)->toContain('search=0');
 });
 
+it('serializes backed enums in query strings', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->http->get('api/general/check', [
+        'status' => \Yannelli\DoseSpot\Enums\PrescriptionStatus::ReadyToSend,
+        'metric' => \Yannelli\DoseSpot\Enums\WeightMetric::Kilograms,
+        'ignored' => null,
+    ]);
+
+    $uri = (string) $factory->lastRequest()->getUri();
+    expect($uri)->toContain('status=8');
+    expect($uri)->toContain('metric=kg');
+    expect($uri)->not->toContain('ignored=');
+});
+
 it('throws a NotFoundException on 404', function () {
     $factory = factory();
     $factory->pushResponse(404, ['Message' => 'patient not found']);

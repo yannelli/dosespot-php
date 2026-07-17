@@ -100,6 +100,12 @@ final class HttpClient
                 continue;
             }
 
+            if ($value instanceof \BackedEnum) {
+                $out[$key] = $value->value;
+
+                continue;
+            }
+
             if (is_bool($value)) {
                 $out[$key] = $value ? 'true' : 'false';
 
