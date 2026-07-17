@@ -21,6 +21,8 @@ final class AccessToken
 
     public function authorizationHeader(): string
     {
-        return ucfirst($this->tokenType).' '.$this->token;
+        // OAuth token_type is case-insensitive. Normalize second+ chars so values
+        // like "BEARER" become the expected "Bearer " scheme.
+        return ucfirst(strtolower($this->tokenType)).' '.$this->token;
     }
 }
