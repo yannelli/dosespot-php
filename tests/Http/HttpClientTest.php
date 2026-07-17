@@ -73,9 +73,15 @@ it('throws a NotFoundException on 404', function () {
 it('throws a ValidationException on 400 / 422', function () {
     $factory = factory();
     $factory->pushResponse(400, ['Result' => ['ResultDescription' => 'bad data']]);
+    $factory->pushResponse(422, ['Message' => 'payload failed validation']);
 
-    expect(fn () => $factory->preauthorizedClient()->patients()->create([]))
+    $client = $factory->preauthorizedClient();
+
+    expect(fn () => $client->patients()->create([]))
         ->toThrow(ValidationException::class, 'bad data');
+
+    expect(fn () => $client->patients()->create([]))
+        ->toThrow(ValidationException::class, 'payload failed validation');
 });
 
 it('throws an AuthenticationException on 401', function () {
