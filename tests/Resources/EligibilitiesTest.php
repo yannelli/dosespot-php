@@ -62,3 +62,27 @@ it('queries the formulary for a patient eligibility and ndc', function () {
     expect($uri)->toContain('patientEligibilityId=12');
     expect($uri)->toContain('ndc=00378511005');
 });
+
+it('queries prescription benefits with a float quantity', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+
+    $factory->preauthorizedClient()->eligibilities()->prescriptionBenefits(
+        patientId: 5,
+        ndc: '00378511005',
+        pharmacyId: 9876,
+        quantity: 30.5,
+        daysSupply: 30,
+        dispenseUnitTypeId: 26,
+        patientEligibilityId: 12,
+    );
+
+    $uri = (string) $factory->lastRequest()->getUri();
+    expect($uri)->toContain('/api/patients/5/prescriptionbenefits');
+    expect($uri)->toContain('quantity=30.5');
+    expect($uri)->toContain('ndc=00378511005');
+    expect($uri)->toContain('daysSupply=30');
+    expect($uri)->toContain('dispenseUnitTypeID=26');
+    expect($uri)->toContain('patientEligibilityId=12');
+    expect($uri)->toContain('pharmacyId=9876');
+});
