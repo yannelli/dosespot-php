@@ -90,32 +90,53 @@ final class HttpClient
         $out = [];
 
         foreach ($query as $key => $value) {
-            if ($value === null) {
+            $normalized = $this->normalizeQueryValue($value);
+
+            if ($normalized === null) {
                 continue;
             }
 
-            if ($value instanceof \DateTimeInterface) {
-                $out[$key] = $value->format('Y-m-d\TH:i:s');
-
-                continue;
-            }
-
-            if ($value instanceof \BackedEnum) {
-                $out[$key] = $value->value;
-
-                continue;
-            }
-
-            if (is_bool($value)) {
-                $out[$key] = $value ? 'true' : 'false';
-
-                continue;
-            }
-
-            $out[$key] = $value;
+            $out[$key] = $normalized;
         }
 
         return $out;
+    }
+
+    private function normalizeQueryValue(mixed $value): mixed
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d\TH:i:s');
+        }
+
+        if ($value instanceof \BackedEnum) {
+            return $value->value;
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_array($value)) {
+            $out = [];
+
+            foreach ($value as $key => $item) {
+                $normalized = $this->normalizeQueryValue($item);
+
+                if ($normalized === null) {
+                    continue;
+                }
+
+                $out[$key] = $normalized;
+            }
+
+            return $out;
+        }
+
+        return $value;
     }
 
     private function throwForStatus(Response $response): never

@@ -80,6 +80,34 @@ it('serializes backed enums in query strings', function () {
     expect($uri)->not->toContain('ignored=');
 });
 
+it('normalizes nested array query values including enums and null omission', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Items' => []]);
+
+    $client = $factory->preauthorizedClient();
+
+    $client->http->get('api/general/check', [
+        'specialty' => [
+            \Yannelli\DoseSpot\Enums\PrescriptionStatus::ReadyToSend,
+            null,
+            \Yannelli\DoseSpot\Enums\WeightMetric::Kilograms,
+        ],
+        'filters' => [
+            'active' => true,
+            'requestedAt' => new DateTimeImmutable('2026-07-18 14:04:00'),
+            'ignored' => null,
+        ],
+    ]);
+
+    $uri = (string) $factory->lastRequest()->getUri();
+    expect($uri)->toContain('specialty%5B0%5D=8');
+    expect($uri)->toContain('specialty%5B2%5D=kg');
+    expect($uri)->not->toContain('specialty%5B1%5D=');
+    expect($uri)->toContain('filters%5Bactive%5D=true');
+    expect($uri)->toContain('filters%5BrequestedAt%5D=2026-07-18T14%3A04%3A00');
+    expect($uri)->not->toContain('filters%5Bignored%5D=');
+});
+
 it('throws a NotFoundException on 404', function () {
     $factory = factory();
     $factory->pushResponse(404, ['Message' => 'patient not found']);
