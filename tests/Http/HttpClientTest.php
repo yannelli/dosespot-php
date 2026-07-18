@@ -235,3 +235,44 @@ it('falls back to an HTTP status message when the response body is empty', funct
     expect(fn () => $factory->preauthorizedClient()->general()->check())
         ->toThrow(ApiException::class, 'DoseSpot API returned HTTP 503');
 });
+
+it('populates ApiException responseBody and rawResponse on 500 responses', function () {
+    $factory = factory();
+    $payload = [
+        'Message' => 'internal failure',
+        'TraceId' => 'req-abcd',
+    ];
+    $factory->pushResponse(500, $payload);
+
+    try {
+        $factory->preauthorizedClient()->general()->check();
+        fail('Expected ApiException');
+    } catch (ApiException $e) {
+        expect($e->statusCode())->toBe(500);
+        expect($e->getMessage())->toBe('internal failure');
+        expect($e->responseBody())->toBe($payload);
+        expect($e->rawResponse())->toBe(json_encode($payload, JSON_THROW_ON_ERROR));
+    }
+});
+
+it('populates ValidationException responseBody and rawResponse on 422 responses', function () {
+    $factory = factory();
+    $payload = [
+        'Message' => 'payload failed validation',
+        'Errors' => [
+            'PharmacyId' => ['Required'],
+        ],
+    ];
+    $factory->pushResponse(422, $payload);
+
+    try {
+        $factory->preauthorizedClient()->patients()->create([]);
+        fail('Expected ValidationException');
+    } catch (ValidationException $e) {
+        expect($e)->toBeInstanceOf(ApiException::class);
+        expect($e->statusCode())->toBe(422);
+        expect($e->getMessage())->toBe('payload failed validation');
+        expect($e->responseBody())->toBe($payload);
+        expect($e->rawResponse())->toBe(json_encode($payload, JSON_THROW_ON_ERROR));
+    }
+});
