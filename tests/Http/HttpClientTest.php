@@ -276,3 +276,44 @@ it('populates ValidationException responseBody and rawResponse on 422 responses'
         expect($e->rawResponse())->toBe(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 });
+
+it('populates NotFoundException responseBody and rawResponse on 404 responses', function () {
+    $factory = factory();
+    $payload = [
+        'Message' => 'patient not found',
+        'TraceId' => 'req-404',
+    ];
+    $factory->pushResponse(404, $payload);
+
+    try {
+        $factory->preauthorizedClient()->patients()->find(999);
+        fail('Expected NotFoundException');
+    } catch (NotFoundException $e) {
+        expect($e)->toBeInstanceOf(ApiException::class);
+        expect($e->statusCode())->toBe(404);
+        expect($e->getMessage())->toBe('patient not found');
+        expect($e->responseBody())->toBe($payload);
+        expect($e->rawResponse())->toBe(json_encode($payload, JSON_THROW_ON_ERROR));
+    }
+});
+
+it('populates RateLimitException responseBody and rawResponse on 429 responses', function () {
+    $factory = factory();
+    $payload = [
+        'Message' => 'slow down',
+        'TraceId' => 'req-429',
+    ];
+    $factory->pushResponse(429, $payload, ['Retry-After' => '7']);
+
+    try {
+        $factory->preauthorizedClient()->general()->check();
+        fail('Expected RateLimitException');
+    } catch (RateLimitException $e) {
+        expect($e)->toBeInstanceOf(ApiException::class);
+        expect($e->statusCode())->toBe(429);
+        expect($e->getMessage())->toBe('slow down');
+        expect($e->retryAfter())->toBe(7);
+        expect($e->responseBody())->toBe($payload);
+        expect($e->rawResponse())->toBe(json_encode($payload, JSON_THROW_ON_ERROR));
+    }
+});
