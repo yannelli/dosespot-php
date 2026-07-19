@@ -226,3 +226,16 @@ it('forwards configured timeouts to token requests', function () {
     expect($options[RequestOptions::TIMEOUT])->toBe(21);
     expect($options[RequestOptions::CONNECT_TIMEOUT])->toBe(6);
 });
+
+it('throws when a successful token response omits access_token', function () {
+    $factory = factory();
+    $factory->pushResponse(200, [
+        'token_type' => 'bearer',
+        'expires_in' => 3600,
+    ]);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 200');
+});
