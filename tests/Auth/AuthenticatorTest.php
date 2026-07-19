@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptions;
 use Yannelli\DoseSpot\Auth\AccessToken;
 use Yannelli\DoseSpot\Auth\Authenticator;
 use Yannelli\DoseSpot\Config;
@@ -204,4 +205,24 @@ it('defaults token_type to Bearer and expires_in to 3600 when omitted', function
     expect($token->expiresAt)->toBeGreaterThanOrEqual($before + 3600);
     expect($token->expiresAt)->toBeLessThanOrEqual($after + 3600);
     expect($token->isExpired())->toBeFalse();
+});
+
+it('forwards configured timeouts to token requests', function () {
+    $factory = factory();
+    $factory->pushToken('timeout-token');
+
+    $config = new Config(
+        clinicId: '12345',
+        clinicKey: 'super-secret-clinic-key-1234567890',
+        environment: Environment::Staging,
+        userId: 42,
+        timeout: 21,
+        connectTimeout: 6,
+    );
+
+    (new Authenticator($config, $factory->guzzle()))->token();
+
+    $options = $factory->history[0]['options'];
+    expect($options[RequestOptions::TIMEOUT])->toBe(21);
+    expect($options[RequestOptions::CONNECT_TIMEOUT])->toBe(6);
 });

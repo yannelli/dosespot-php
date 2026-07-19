@@ -5,6 +5,12 @@ declare(strict_types=1);
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use GuzzleHttp\RequestOptions;
+use Yannelli\DoseSpot\Auth\AccessToken;
+use Yannelli\DoseSpot\Auth\Authenticator;
+use Yannelli\DoseSpot\Config;
+use Yannelli\DoseSpot\DoseSpot;
+use Yannelli\DoseSpot\Environment;
 use Yannelli\DoseSpot\Exceptions\ApiException;
 use Yannelli\DoseSpot\Exceptions\AuthenticationException;
 use Yannelli\DoseSpot\Exceptions\NotFoundException;
@@ -316,4 +322,32 @@ it('populates RateLimitException responseBody and rawResponse on 429 responses',
         expect($e->responseBody())->toBe($payload);
         expect($e->rawResponse())->toBe(json_encode($payload, JSON_THROW_ON_ERROR));
     }
+});
+
+it('forwards configured timeouts to outbound API requests', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 1]);
+
+    $config = new Config(
+        clinicId: '12345',
+        clinicKey: 'super-secret-clinic-key-1234567890',
+        environment: Environment::Staging,
+        userId: 42,
+        timeout: 17,
+        connectTimeout: 4,
+    );
+
+    $guzzle = $factory->guzzle();
+    $auth = new Authenticator($config, $guzzle);
+    $auth->setToken(new AccessToken(
+        token: 'cached-token',
+        tokenType: 'bearer',
+        expiresAt: time() + 3600,
+    ));
+
+    (new DoseSpot($config, $guzzle, $auth))->general()->check();
+
+    $options = $factory->history[0]['options'];
+    expect($options[RequestOptions::TIMEOUT])->toBe(17);
+    expect($options[RequestOptions::CONNECT_TIMEOUT])->toBe(4);
 });
