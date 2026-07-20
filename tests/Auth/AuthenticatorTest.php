@@ -239,3 +239,29 @@ it('throws when a successful token response omits access_token', function () {
     expect(fn () => $auth->token())
         ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 200');
 });
+
+it('falls back to an HTTP status message when the token response body is not a JSON object', function () {
+    $factory = factory();
+    $factory->pushRaw(new \GuzzleHttp\Psr7\Response(
+        503,
+        ['Content-Type' => 'text/html'],
+        '<html>bad gateway</html>',
+    ));
+    $factory->pushRaw(new \GuzzleHttp\Psr7\Response(
+        400,
+        ['Content-Type' => 'application/json'],
+        '"unexpected"',
+    ));
+    $factory->pushRaw(new \GuzzleHttp\Psr7\Response(500, [], ''));
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 503');
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 400');
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 500');
+});
