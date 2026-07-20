@@ -265,3 +265,24 @@ it('falls back to an HTTP status message when the token response body is not a J
     expect(fn () => $auth->token())
         ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 500');
 });
+
+it('uses a custom KeyGenerator for the token password grant', function () {
+    $factory = factory();
+    $factory->pushToken('custom-key-token');
+
+    $generator = new class () extends \Yannelli\DoseSpot\Auth\KeyGenerator {
+        public function generate(string $clinicKey, ?string $seed = null): string
+        {
+            return 'deterministic-custom-password-from-test';
+        }
+    };
+
+    (new Authenticator($factory->config(), $factory->guzzle(), $generator))->token();
+
+    $request = $factory->lastRequest();
+    parse_str((string) $request->getBody(), $form);
+
+    expect($form['Password'])->toBe('deterministic-custom-password-from-test');
+    expect($form['grant_type'])->toBe('password');
+    expect($form['Username'])->toBe('12345');
+});
