@@ -200,6 +200,14 @@ it('surfaces OAuth-style error descriptions from API responses', function () {
         ->toThrow(ApiException::class, 'temporarily unavailable');
 });
 
+it('surfaces OAuth-style error values when no error description is present', function () {
+    $factory = factory();
+    $factory->pushResponse(500, ['error' => 'server_error']);
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(ApiException::class, 'server_error');
+});
+
 it('throws an AuthenticationException on 403', function () {
     $factory = factory();
     $factory->pushResponse(403, ['Message' => 'forbidden']);
