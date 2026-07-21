@@ -286,3 +286,17 @@ it('uses a custom KeyGenerator for the token password grant', function () {
     expect($form['grant_type'])->toBe('password');
     expect($form['Username'])->toBe('12345');
 });
+
+it('falls back to an HTTP status message when the JSON error object has no known keys', function () {
+    $factory = factory();
+    $factory->pushResponse(401, ['foo' => 'bar', 'code' => 12]);
+    $factory->pushResponse(503, []);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 401');
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 503');
+});
