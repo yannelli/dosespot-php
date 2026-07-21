@@ -26,3 +26,23 @@ it('is deterministic for a given seed and clinic key', function () {
 
     expect($generator->generate('k', $seed))->toBe($generator->generate('k', $seed));
 });
+
+it('uses randomBytes for an unspecified seed so subclasses can control entropy', function () {
+    $generator = new class () extends KeyGenerator {
+        public int $calls = 0;
+
+        protected function randomBytes(int $length): string
+        {
+            $this->calls++;
+
+            expect($length)->toBe(32);
+
+            return str_repeat("\x03", $length);
+        }
+    };
+
+    $key = $generator->generate('clinic-key');
+
+    expect($generator->calls)->toBe(1);
+    expect($key)->toBe((new KeyGenerator())->generate('clinic-key', str_repeat("\x03", 32)));
+});
