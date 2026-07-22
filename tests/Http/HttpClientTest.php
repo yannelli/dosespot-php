@@ -197,6 +197,20 @@ it('clamps past HTTP-date Retry-After headers to zero on 429 responses', functio
     }
 });
 
+it('leaves retryAfter null when a 429 response omits Retry-After', function () {
+    $factory = factory();
+    $factory->pushResponse(429, ['Message' => 'slow down']);
+
+    try {
+        $factory->preauthorizedClient()->general()->check();
+        fail('Expected RateLimitException');
+    } catch (RateLimitException $e) {
+        expect($e->statusCode())->toBe(429);
+        expect($e->getMessage())->toBe('slow down');
+        expect($e->retryAfter())->toBeNull();
+    }
+});
+
 it('throws a generic ApiException on 500-class responses', function () {
     $factory = factory();
     $factory->pushResponse(500, ['Message' => 'boom']);
