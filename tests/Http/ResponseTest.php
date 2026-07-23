@@ -97,3 +97,18 @@ it('keeps body available for json after body is read first', function () {
     expect($decoded)->toBe(['Message' => 'patient not found']);
     expect($response->body())->toBe($rawBody);
 });
+
+it('returns an empty array when JSON decodes to a non-array value', function (string $body) {
+    $response = new Response(new GuzzleResponse(200, [], $body));
+
+    expect($response->json())->toBe([]);
+    // Cache the same empty array on a second call.
+    expect($response->json())->toBe([]);
+})->with([
+    'null' => ['null'],
+    'true' => ['true'],
+    'false' => ['false'],
+    'integer' => ['42'],
+    'float' => ['3.14'],
+    'string' => ['"not-an-object"'],
+]);
