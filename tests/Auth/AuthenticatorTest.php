@@ -300,3 +300,18 @@ it('falls back to an HTTP status message when the JSON error object has no known
     expect(fn () => $auth->token())
         ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 503');
 });
+
+it('prefers Result.ResultDescription over Message and OAuth error fields', function () {
+    $factory = factory();
+    $factory->pushResponse(401, [
+        'Result' => ['ResultDescription' => 'result description wins'],
+        'Message' => 'message ignored',
+        'error_description' => 'oauth description ignored',
+        'error' => 'error ignored',
+    ]);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'result description wins');
+});
