@@ -235,6 +235,19 @@ it('surfaces OAuth-style error values when no error description is present', fun
         ->toThrow(ApiException::class, 'server_error');
 });
 
+it('prefers Result.ResultDescription over Message and OAuth error fields', function () {
+    $factory = factory();
+    $factory->pushResponse(500, [
+        'Result' => ['ResultDescription' => 'result description wins'],
+        'Message' => 'message ignored',
+        'error_description' => 'oauth description ignored',
+        'error' => 'error ignored',
+    ]);
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(ApiException::class, 'result description wins');
+});
+
 it('throws an AuthenticationException on 403', function () {
     $factory = factory();
     $factory->pushResponse(403, ['Message' => 'forbidden']);
