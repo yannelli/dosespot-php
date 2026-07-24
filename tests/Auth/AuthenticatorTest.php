@@ -315,3 +315,18 @@ it('prefers Result.ResultDescription over Message and OAuth error fields', funct
     expect(fn () => $auth->token())
         ->toThrow(AuthenticationException::class, 'result description wins');
 });
+
+it('falls through Result without ResultDescription to error_description', function () {
+    $factory = factory();
+    $factory->pushResponse(401, [
+        'Result' => ['ResultCode' => 'ERROR'],
+        'error_description' => 'oauth description wins after empty Result',
+        'Message' => 'message ignored',
+        'error' => 'error ignored',
+    ]);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'oauth description wins after empty Result');
+});
