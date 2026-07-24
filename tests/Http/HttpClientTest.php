@@ -411,3 +411,16 @@ it('forwards configured timeouts to outbound API requests', function () {
     expect($options[RequestOptions::TIMEOUT])->toBe(17);
     expect($options[RequestOptions::CONNECT_TIMEOUT])->toBe(4);
 });
+
+it('falls through to Message when Result exists without ResultDescription', function () {
+    $factory = factory();
+    $factory->pushResponse(500, [
+        'Result' => ['ResultCode' => 'ERROR'],
+        'Message' => 'result wrapper without description',
+        'error_description' => 'oauth description ignored',
+        'error' => 'error ignored',
+    ]);
+
+    expect(fn () => $factory->preauthorizedClient()->general()->check())
+        ->toThrow(ApiException::class, 'result wrapper without description');
+});
