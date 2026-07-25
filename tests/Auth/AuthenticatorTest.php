@@ -343,3 +343,17 @@ it('prefers Message over error when higher-priority fields are absent', function
     expect(fn () => $auth->token())
         ->toThrow(AuthenticationException::class, 'message wins over bare error');
 });
+
+it('prefers error_description over Message when Result is absent', function () {
+    $factory = factory();
+    $factory->pushResponse(401, [
+        'error_description' => 'oauth description wins without Result',
+        'Message' => 'message ignored',
+        'error' => 'error ignored',
+    ]);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'oauth description wins without Result');
+});
