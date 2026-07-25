@@ -357,3 +357,27 @@ it('prefers error_description over Message when Result is absent', function () {
     expect(fn () => $auth->token())
         ->toThrow(AuthenticationException::class, 'oauth description wins without Result');
 });
+
+it('refreshes the token when only the expiry leeway remains', function () {
+    $factory = factory();
+    $factory->pushToken('post-leeway', 3600);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    // Default AccessToken leeway is 30s. A token still valid for 20s is treated
+    // as expired so callers do not race an actually-expired bearer.
+    $withinLeeway = new AccessToken(
+        token: 'pre-leeway',
+        tokenType: 'bearer',
+        expiresAt: time() + 20,
+    );
+
+    $auth->setToken($withinLeeway);
+
+    $token = $auth->token();
+
+    expect($token->token)->toBe('post-leeway');
+    expect($token)->not->toBe($withinLeeway);
+    expect($factory->history)->toHaveCount(1);
+    expect($factory->lastRequest()->getUri()->getPath())->toBe('/webapi/token');
+});
