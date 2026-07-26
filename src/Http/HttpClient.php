@@ -164,19 +164,23 @@ final class HttpClient
     private function extractMessage(array $decoded, string $body, int $status): string
     {
         if (isset($decoded['Result']['ResultDescription'])) {
-            return (string) $decoded['Result']['ResultDescription'];
+            $description = trim((string) $decoded['Result']['ResultDescription']);
+
+            if ($description !== '') {
+                return $description;
+            }
         }
 
-        if (isset($decoded['Message'])) {
-            return (string) $decoded['Message'];
-        }
+        foreach (['Message', 'error_description', 'error'] as $key) {
+            if (! isset($decoded[$key])) {
+                continue;
+            }
 
-        if (isset($decoded['error_description'])) {
-            return (string) $decoded['error_description'];
-        }
+            $value = trim((string) $decoded[$key]);
 
-        if (isset($decoded['error'])) {
-            return (string) $decoded['error'];
+            if ($value !== '') {
+                return $value;
+            }
         }
 
         return $body !== '' ? $body : ('DoseSpot API returned HTTP '.$status);

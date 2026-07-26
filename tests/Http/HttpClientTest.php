@@ -424,3 +424,40 @@ it('falls through to Message when Result exists without ResultDescription', func
     expect(fn () => $factory->preauthorizedClient()->general()->check())
         ->toThrow(ApiException::class, 'result wrapper without description');
 });
+
+it('falls through blank or whitespace hierarchical error fields to the next useful value', function () {
+    $factory = factory();
+    $factory->pushResponse(500, [
+        'Result' => ['ResultDescription' => '   '],
+        'Message' => '',
+        'error_description' => ' oauth description wins ',
+        'error' => 'error ignored',
+    ]);
+    $factory->pushResponse(400, [
+        'Message' => "\t",
+        'error' => ' bare error wins ',
+    ]);
+    $factory->pushResponse(503, [
+        'Result' => ['ResultDescription' => ''],
+        'Message' => '',
+        'error_description' => '',
+        'error' => '',
+        'upstream' => 'still fails',
+    ]);
+
+    $client = $factory->preauthorizedClient();
+
+    expect(fn () => $client->general()->check())
+        ->toThrow(ApiException::class, 'oauth description wins');
+
+    expect(fn () => $client->patients()->create([]))
+        ->toThrow(ValidationException::class, 'bare error wins');
+
+    try {
+        $client->general()->check();
+        fail('Expected ApiException');
+    } catch (ApiException $e) {
+        expect($e->getMessage())->toContain('upstream');
+        expect($e->getMessage())->not->toBe('');
+    }
+});
