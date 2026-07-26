@@ -102,12 +102,22 @@ final class Authenticator
         }
 
         if (isset($decoded['Result']['ResultDescription'])) {
-            return (string) $decoded['Result']['ResultDescription'];
+            $description = trim((string) $decoded['Result']['ResultDescription']);
+
+            if ($description !== '') {
+                return $description;
+            }
         }
 
         foreach (['error_description', 'Message', 'error'] as $key) {
-            if (isset($decoded[$key])) {
-                return (string) $decoded[$key];
+            if (! isset($decoded[$key])) {
+                continue;
+            }
+
+            $value = trim((string) $decoded[$key]);
+
+            if ($value !== '') {
+                return $value;
             }
         }
 

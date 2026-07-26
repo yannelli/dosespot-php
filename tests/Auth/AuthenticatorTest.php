@@ -381,3 +381,35 @@ it('refreshes the token when only the expiry leeway remains', function () {
     expect($factory->history)->toHaveCount(1);
     expect($factory->lastRequest()->getUri()->getPath())->toBe('/webapi/token');
 });
+
+it('falls through blank or whitespace token error fields to the next useful value', function () {
+    $factory = factory();
+    $factory->pushResponse(401, [
+        'Result' => ['ResultDescription' => '  '],
+        'error_description' => '',
+        'Message' => ' message wins after blanks ',
+        'error' => 'error ignored',
+    ]);
+    $factory->pushResponse(400, [
+        'error_description' => "\n",
+        'Message' => '',
+        'error' => ' bare oauth error ',
+    ]);
+    $factory->pushResponse(503, [
+        'Result' => ['ResultDescription' => ''],
+        'error_description' => '',
+        'Message' => '',
+        'error' => '',
+    ]);
+
+    $auth = new Authenticator($factory->config(), $factory->guzzle());
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'message wins after blanks');
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'bare oauth error');
+
+    expect(fn () => $auth->token())
+        ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 503');
+});
