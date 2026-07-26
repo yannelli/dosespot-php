@@ -461,3 +461,26 @@ it('falls through blank or whitespace hierarchical error fields to the next usef
         expect($e->getMessage())->not->toBe('');
     }
 });
+
+it('omits a JSON body when POST helpers pass a null body', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+
+    // Prescriptions::send / setPrinted / sendOnBehalfOf call post($path) with no body.
+    $client->prescriptions()->send(5, 99);
+    $client->prescriptions()->setPrinted(5, 99);
+    $client->prescriptions()->sendOnBehalfOf(5, 99, 77);
+
+    foreach ([0, 1, 2] as $index) {
+        $request = $factory->history[$index]['request'];
+        $options = $factory->history[$index]['options'];
+
+        expect($request->getMethod())->toBe('POST');
+        expect((string) $request->getBody())->toBe('');
+        expect($options)->not->toHaveKey(RequestOptions::JSON);
+    }
+});
