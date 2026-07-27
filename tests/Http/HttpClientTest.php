@@ -484,3 +484,27 @@ it('omits a JSON body when POST helpers pass a null body', function () {
         expect($options)->not->toHaveKey(RequestOptions::JSON);
     }
 });
+
+it('sends an empty JSON body when helpers pass an empty array payload', function () {
+    $factory = factory();
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+    $factory->pushResponse(200, []);
+
+    $client = $factory->preauthorizedClient();
+
+    // sendEpcs / cancel default the payload to [], which must still serialize as JSON
+    // (null omits the body entirely; empty array is an intentional empty payload).
+    $client->prescriptions()->sendEpcs(5, 99);
+    $client->prescriptions()->cancel(5, 99);
+    $client->http->post('api/general/check', []);
+
+    foreach ([0, 1, 2] as $index) {
+        $request = $factory->history[$index]['request'];
+
+        expect($request->getMethod())->toBe('POST');
+        expect((string) $request->getBody())->toBe('[]');
+        expect(json_decode((string) $request->getBody(), true))->toBe([]);
+        expect($request->getHeaderLine('Content-Type'))->toContain('application/json');
+    }
+});
