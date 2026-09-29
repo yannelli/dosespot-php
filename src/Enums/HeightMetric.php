@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Yannelli\DoseSpot\Enums;
 
+/**
+ * AddEditPatientRequest.HeightMetric in the Full + EPCS v2 spec.
+ */
 enum HeightMetric: string
 {
-    case Inches = 'in';
-    case Centimeters = 'cm';
-    case Meters = 'm';
-    case Feet = 'ft';
+    case Inch = 'inch';
+    case Centimeter = 'cm';
 }

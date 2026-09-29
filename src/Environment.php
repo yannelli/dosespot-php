@@ -12,8 +12,8 @@ enum Environment: string
     public function baseUrl(): string
     {
         return match ($this) {
-            self::Production => 'https://my.dosespot.com/webapi',
-            self::Staging => 'https://my.staging.dosespot.com/webapi',
+            self::Production => 'https://my.dosespot.com/webapi/v2',
+            self::Staging => 'https://my.staging.dosespot.com/webapi/v2',
         };
     }
 }

@@ -8,6 +8,10 @@ class Clinics extends Resource
 {
     /**
      * GET /api/clinics/{clinicId}
+     *
+     * Gets clinic information.
+     *
+     * @dosespot Clinics_GetClinicDetailsV2
      */
     public function find(int $clinicId): array
     {
@@ -16,6 +20,10 @@ class Clinics extends Resource
 
     /**
      * POST /api/clinics
+     *
+     * Add clinic.
+     *
+     * @dosespot Clinics_ClinicAddV2
      */
     public function create(array $clinic): array
     {
@@ -23,42 +31,93 @@ class Clinics extends Resource
     }
 
     /**
-     * POST /api/clinics/{clinicId}
-     *
-     * Update specific fields on a clinic.
-     */
-    public function update(int $clinicId, array $clinic): array
-    {
-        return $this->post("api/clinics/{$clinicId}", $clinic);
-    }
-
-    /**
      * PUT /api/clinics/{clinicId}
      *
-     * Replace a clinic's data.
+     * Edit Clinic information.
+     *
+     * @dosespot Clinics_ClinicEditV2
      */
-    public function replace(int $clinicId, array $clinic): array
+    public function update(int $clinicId, array $clinic): array
     {
         return $this->put("api/clinics/{$clinicId}", $clinic);
     }
 
     /**
-     * POST /api/clinics/clinicRemoveClinicians
+     * GET /api/patients/{patientId}/clinics
      *
-     * Remove clinician associations from a clinic.
+     * Get patient's clinics.
+     *
+     * @dosespot Clinics_GetPatientClinicsV2
      */
-    public function removeClinicians(int $clinicId, array $payload = []): array
+    public function forPatient(int $patientId): array
     {
-        return $this->post('api/clinics/clinicRemoveClinicians', $payload, ['clinicId' => $clinicId]);
+        return $this->get("api/patients/{$patientId}/clinics");
     }
 
     /**
-     * POST /api/clinics/clinicGroup
+     * GET /api/clinicians/{clinicianId}/clinicIds
      *
-     * Create a clinic group.
+     * Gets a clinician's clinic identifiers.
+     * clinicStatus is Active, Inactive, or All.
+     *
+     * @dosespot Clinics_GetClinicianClinicsV2
      */
-    public function createGroup(array $group): array
+    public function forClinician(
+        int $clinicianId,
+        ?bool $includeClinicGroups = null,
+        \BackedEnum|string|null $clinicStatus = null,
+    ): array {
+        return $this->get("api/clinicians/{$clinicianId}/clinicIds", [
+            'includeClinicGroups' => $includeClinicGroups,
+            'clinicStatus' => $clinicStatus,
+        ]);
+    }
+
+    /**
+     * POST /api/patients/{patientId}/transfer
+     *
+     * Transfer patient clinic.
+     *
+     * @dosespot Clinics_PatientClinicTransferV2
+     */
+    public function transferPatient(int $patientId, array $payload): array
     {
-        return $this->post('api/clinics/clinicGroup', $group);
+        return $this->post("api/patients/{$patientId}/transfer", $payload);
+    }
+
+    /**
+     * POST /api/clinicians/{clinicianId}/clinics
+     *
+     * Add clinician clinics.
+     *
+     * @dosespot Clinics_ClinicianAddMultipleClinicsV2
+     */
+    public function addClinics(int $clinicianId, array $payload): array
+    {
+        return $this->post("api/clinicians/{$clinicianId}/clinics", $payload);
+    }
+
+    /**
+     * DELETE /api/clinics/{clinicId}/clinicians
+     *
+     * Removes clinician(s) from a specified clinic.
+     *
+     * @dosespot Clinics_ClinicRemoveMultipleCliniciansV2
+     */
+    public function removeClinicians(int $clinicId, array $payload): array
+    {
+        return $this->delete("api/clinics/{$clinicId}/clinicians", body: $payload);
+    }
+
+    /**
+     * POST /api/clinicGroups
+     *
+     * Manages clinic groups.
+     *
+     * @dosespot ClinicGroups_AddEditClinicGroupV2
+     */
+    public function saveGroup(array $group): array
+    {
+        return $this->post('api/clinicGroups', $group);
     }
 }

@@ -28,9 +28,14 @@ abstract class Resource
         return $this->client->put($path, $body, $query)->json();
     }
 
-    protected function delete(string $path, array $query = []): array
+    protected function patch(string $path, ?array $body = null, array $query = []): array
     {
-        return $this->client->delete($path, $query)->json();
+        return $this->client->patch($path, $body, $query)->json();
+    }
+
+    protected function delete(string $path, array $query = [], ?array $body = null): array
+    {
+        return $this->client->delete($path, $query, $body)->json();
     }
 
     protected function raw(string $method, string $path, ?array $body = null, array $query = []): Response

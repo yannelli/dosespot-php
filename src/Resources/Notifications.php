@@ -8,6 +8,10 @@ class Notifications extends Resource
 {
     /**
      * GET /api/notifications/counts
+     *
+     * Get Notification Counts For Current Clinician.
+     *
+     * @dosespot Notifications_GetPrescriberNotificationCountsV2
      */
     public function counts(): array
     {
@@ -15,35 +19,18 @@ class Notifications extends Resource
     }
 
     /**
-     * GET /api/notifications/batchCounts
-     *
-     * @param  list<int>  $clinicianIds
-     */
-    public function batchCounts(array $clinicianIds): array
-    {
-        return $this->get('api/notifications/batchCounts', [
-            'clinicianId' => $clinicianIds,
-        ]);
-    }
-
-    /**
      * GET /api/notifications/errors
+     *
+     * Get Transmission Errors For Current Clinician.
+     * clinic is All or Current.
+     *
+     * @dosespot Notifications_GetTransmissionErrorDetailsV2
      */
-    public function errors(): array
+    public function errors(?int $pageNumber = null, \BackedEnum|string|null $clinic = null): array
     {
-        return $this->get('api/notifications/errors');
-    }
-
-    /**
-     * GET /api/notifications/errorsByClient
-     */
-    public function errorsByClient(
-        \DateTimeInterface|string|null $startDate = null,
-        \DateTimeInterface|string|null $endDate = null,
-    ): array {
-        return $this->get('api/notifications/errorsByClient', [
-            'startDate' => $startDate,
-            'endDate' => $endDate,
+        return $this->get('api/notifications/errors', [
+            'pageNumber' => $pageNumber,
+            'clinic' => $clinic,
         ]);
     }
 }

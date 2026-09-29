@@ -9,62 +9,65 @@ class Medications extends Resource
     /**
      * GET /api/medications/search
      *
-     * Search medications by name with full details.
+     * Search for drugs. drugStatus is Active, Inactive, or All.
+     *
+     * @dosespot Medications_MedicationSearchV2
      */
-    public function search(string $name): array
+    public function search(string $name, \BackedEnum|string|null $drugStatus = null, ?int $pageNumber = null): array
     {
-        return $this->get('api/medications/search', ['name' => $name]);
+        return $this->get('api/medications/search', [
+            'name' => $name,
+            'drugStatus' => $drugStatus,
+            'pageNumber' => $pageNumber,
+        ]);
     }
 
     /**
-     * GET /api/medications/basicSearch
+     * GET /api/medications/searchByRxCUI
      *
-     * Lightweight medication search by name.
+     * Get dispensable drugs by rxCUI.
+     *
+     * @dosespot Medications_MedicationSearchRxCUIV2
      */
-    public function basicSearch(string $name): array
+    public function searchByRxCui(?string $rxCui = null): array
     {
-        return $this->get('api/medications/basicSearch', ['name' => $name]);
+        return $this->get('api/medications/searchByRxCUI', [
+            'rxCUI' => $rxCui,
+        ]);
     }
 
     /**
      * GET /api/medications/select
      *
-     * Look up medication details by RxCUI, name, and strength.
+     * Get dispensable drug detail.
+     *
+     * @dosespot Medications_MedicationSelectV2
      */
-    public function select(string $rxCui, string $name, ?string $strength = null): array
+    public function select(?int $dispensableDrugId = null, ?string $ndc = null, ?int $rxcui = null): array
     {
         return $this->get('api/medications/select', [
-            'RxCUI' => $rxCui,
-            'Name' => $name,
-            'Strength' => $strength,
+            'dispensableDrugId' => $dispensableDrugId,
+            'nDC' => $ndc,
+            'rXCUI' => $rxcui,
         ]);
     }
 
     /**
-     * GET /api/patients/{patientId}/medications/history
+     * GET /api/medications/monograph
      *
-     * Retrieve a patient's medication history.
+     * Get Drug Monograph. monographFormat is HTML or XML.
+     *
+     * @dosespot Medications_GetDrugMonographV2
      */
-    public function history(
-        int $patientId,
-        \DateTimeInterface|string|null $start = null,
-        \DateTimeInterface|string|null $end = null,
-        ?int $onBehalfOfUserId = null,
+    public function monograph(
+        ?int $dispensableDrugId = null,
+        ?string $ndc = null,
+        \BackedEnum|string|null $monographFormat = null,
     ): array {
-        return $this->get("api/patients/{$patientId}/medications/history", [
-            'start' => $start,
-            'end' => $end,
-            'onBehalfOfUserId' => $onBehalfOfUserId,
+        return $this->get('api/medications/monograph', [
+            'dispensableDrugId' => $dispensableDrugId,
+            'nDC' => $ndc,
+            'monographFormat' => $monographFormat,
         ]);
-    }
-
-    /**
-     * GET /api/patients/{patientId}/medications/interactions
-     *
-     * Check drug-drug interactions for a patient.
-     */
-    public function interactions(int $patientId): array
-    {
-        return $this->get("api/patients/{$patientId}/medications/interactions");
     }
 }

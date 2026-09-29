@@ -4,21 +4,28 @@ declare(strict_types=1);
 
 namespace Yannelli\DoseSpot\Enums;
 
-enum PrescriptionStatus: int
+/**
+ * Prescription transmission status from the Full + EPCS v2 spec.
+ *
+ * Includes Retracted, which the prescription-list query accepts, and Unknown,
+ * which prescription records return.
+ */
+enum PrescriptionStatus: string
 {
-    case Entered = 1;
-    case Printed = 2;
-    case Sending = 3;
-    case ErrorSending = 4;
-    case SentSuccessfully = 5;
-    case Received = 6;
-    case ReceivedWithErrors = 7;
-    case ReadyToSend = 8;
-    case PharmacyVerified = 9;
-    case Deleted = 10;
-    case EditedAndUnsent = 11;
-    case PendingReview = 12;
-    case EpcsError = 13;
-    case Rejected = 14;
-    case EpcsSigned = 15;
+    case Unknown = 'Unknown';
+    case Entered = 'Entered';
+    case Printed = 'Printed';
+    case Sending = 'Sending';
+    case ERxSent = 'eRxSent';
+    case FaxSent = 'FaxSent';
+    case Error = 'Error';
+    case Deleted = 'Deleted';
+    case Requested = 'Requested';
+    case Edited = 'Edited';
+    case EpcsError = 'EpcsError';
+    case EpcsSigned = 'EpcsSigned';
+    case ReadyToSign = 'ReadyToSign';
+    case PharmacyVerified = 'PharmacyVerified';
+    case PharmacySelect = 'PharmacySelect';
+    case Retracted = 'Retracted';
 }

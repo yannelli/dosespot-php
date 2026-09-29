@@ -7,19 +7,11 @@ namespace Yannelli\DoseSpot\Resources;
 class Allergies extends Resource
 {
     /**
-     * GET /api/allergies/search
-     *
-     * Search the allergen database by free-text query.
-     */
-    public function search(string $query): array
-    {
-        return $this->get('api/allergies/search', ['q' => $query]);
-    }
-
-    /**
      * GET /api/patients/{patientId}/allergies
      *
-     * List all allergies for a patient.
+     * Get patient's allergies.
+     *
+     * @dosespot Allergies_GetPatientAllergiesV2
      */
     public function forPatient(int $patientId): array
     {
@@ -27,42 +19,50 @@ class Allergies extends Resource
     }
 
     /**
-     * POST /api/patients/{patientId}/allergies
-     *
-     * Record a new allergy for a patient.
-     */
-    public function create(int $patientId, array $allergy): array
-    {
-        return $this->post("api/patients/{$patientId}/allergies", $allergy);
-    }
-
-    /**
      * PUT /api/patients/{patientId}/allergies/{patientAllergyId}
      *
-     * Replace an existing allergy record.
+     * Edit drug allergy.
+     *
+     * @dosespot Allergies_EditPatientAllergyV2
      */
-    public function replace(int $patientId, int $patientAllergyId, array $allergy): array
+    public function update(int $patientId, int $patientAllergyId, array $allergy): array
     {
         return $this->put("api/patients/{$patientId}/allergies/{$patientAllergyId}", $allergy);
     }
 
     /**
-     * POST /api/patients/{patientId}/allergies/{patientAllergyId}
+     * POST /api/patients/{patientId}/allergies/coded
      *
-     * Update specific fields on a patient's allergy.
+     * Add coded patient allergy.
+     *
+     * @dosespot Allergies_AddCodedPatientAllergyV2
      */
-    public function update(int $patientId, int $patientAllergyId, array $allergy): array
+    public function createCoded(int $patientId, array $allergy): array
     {
-        return $this->post("api/patients/{$patientId}/allergies/{$patientAllergyId}", $allergy);
+        return $this->post("api/patients/{$patientId}/allergies/coded", $allergy);
     }
 
     /**
-     * GET /api/patients/{patientId}/allergies/interactions
+     * POST /api/patients/{patientId}/allergies/freetext
      *
-     * Retrieve allergy-medication interactions for a patient.
+     * Add freetext patient allergy.
+     *
+     * @dosespot Allergies_AddFreetextPatientAllergyV2
      */
-    public function interactions(int $patientId): array
+    public function createFreetext(int $patientId, array $allergy): array
     {
-        return $this->get("api/patients/{$patientId}/allergies/interactions");
+        return $this->post("api/patients/{$patientId}/allergies/freetext", $allergy);
+    }
+
+    /**
+     * POST /api/patients/{patientId}/allergies/noKnownAllergy
+     *
+     * Add no known patient allergy record.
+     *
+     * @dosespot Allergies_AddNoKnownPatientAllergyV2
+     */
+    public function createNoKnown(int $patientId): array
+    {
+        return $this->post("api/patients/{$patientId}/allergies/noKnownAllergy");
     }
 }

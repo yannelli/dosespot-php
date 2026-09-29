@@ -1,6 +1,6 @@
 {
     "name": "yannelli/dosespot-php",
-    "description": "A modern PHP client for the DoseSpot e-prescribing Web API.",
+    "description": "A modern PHP client for the DoseSpot e-prescribing Web API v2.",
     "keywords": [
         "yannelli",
         "dosespot",
