@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Yannelli\DoseSpot\Enums;
 
-enum GenderType: int
+/**
+ * AddEditPatientRequest.Gender in the Full + EPCS v2 spec.
+ */
+enum GenderType: string
 {
-    case Male = 1;
-    case Female = 2;
-    case Unknown = 3;
+    case Male = 'Male';
+    case Female = 'Female';
+    case Unknown = 'Unknown';
 }

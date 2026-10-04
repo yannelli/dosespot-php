@@ -9,7 +9,9 @@ class DispenseUnits extends Resource
     /**
      * GET /api/dispenseUnits
      *
-     * List all available dispense units used for prescription quantities.
+     * Get Dispense Units.
+     *
+     * @dosespot Medications_GetStandardDispenseUnitsV2
      */
     public function all(): array
     {
@@ -17,12 +19,14 @@ class DispenseUnits extends Resource
     }
 
     /**
-     * GET /api/units/dispenseUnits/{id}
+     * GET /api/dispenseUnits/{dispenseUnitId}
      *
-     * Retrieve a specific dispense unit by id.
+     * Get Dispense Unit By Id.
+     *
+     * @dosespot Medications_GetStandardDispenseUnitByIDV2
      */
-    public function find(int $id): array
+    public function find(int $dispenseUnitId): array
     {
-        return $this->get("api/units/dispenseUnits/{$id}");
+        return $this->get("api/dispenseUnits/{$dispenseUnitId}");
     }
 }

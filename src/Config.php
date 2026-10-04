@@ -13,14 +13,19 @@ final class Config
     public function __construct(
         public readonly string $clinicId,
         public readonly string $clinicKey,
+        public readonly string $subscriptionKey,
+        public readonly int $userId,
         public readonly Environment $environment = Environment::Production,
-        public readonly ?int $userId = null,
         public readonly int $timeout = 30,
         public readonly int $connectTimeout = 10,
         ?string $baseUrl = null,
     ) {
-        if ($clinicId === '' || $clinicKey === '') {
-            throw new DoseSpotException('Clinic ID and Clinic Key are required.');
+        if ($clinicId === '' || $clinicKey === '' || $subscriptionKey === '') {
+            throw new DoseSpotException('Clinic ID, clinic key, and subscription key are required.');
+        }
+
+        if ($userId < 1) {
+            throw new DoseSpotException('userId must be a positive DoseSpot clinician id.');
         }
 
         if ($timeout < 1 || $connectTimeout < 1) {
@@ -32,7 +37,7 @@ final class Config
 
     public function tokenUrl(): string
     {
-        return $this->baseUrl.'/token';
+        return $this->baseUrl.'/connect/token';
     }
 
     public function apiUrl(string $path): string
@@ -45,8 +50,9 @@ final class Config
         return new self(
             clinicId: $this->clinicId,
             clinicKey: $this->clinicKey,
-            environment: $this->environment,
+            subscriptionKey: $this->subscriptionKey,
             userId: $userId,
+            environment: $this->environment,
             timeout: $this->timeout,
             connectTimeout: $this->connectTimeout,
             baseUrl: $this->baseUrl,

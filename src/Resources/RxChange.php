@@ -7,116 +7,92 @@ namespace Yannelli\DoseSpot\Resources;
 class RxChange extends Resource
 {
     /**
-     * GET /api/notifications/rxchange/clinician
+     * GET /api/rxchanges/pending
+     *
+     * Get Clinician's Rx Change requests for clinic(s)/patient.
+     * clinic is All or Current.
+     *
+     * @dosespot RxChanges_GetRxChangeQueueV2
      */
-    public function forClinician(): array
-    {
-        return $this->get('api/notifications/rxchange/clinician');
-    }
-
-    /**
-     * GET /api/notifications/rxchange/clinic
-     */
-    public function forClinic(): array
-    {
-        return $this->get('api/notifications/rxchange/clinic');
-    }
-
-    /**
-     * GET /api/notifications/rxchange/client
-     */
-    public function forClient(): array
-    {
-        return $this->get('api/notifications/rxchange/client');
-    }
-
-    /**
-     * GET /api/notifications/rxchange/patients/{patientId}
-     */
-    public function forPatient(int $patientId): array
-    {
-        return $this->get("api/notifications/rxchange/patients/{$patientId}");
-    }
-
-    /**
-     * POST /api/notifications/rxchange/patients/{patientId}/{rxChangeId}/reconcile
-     */
-    public function reconcile(int $patientId, int $rxChangeId, array $payload = []): array
-    {
-        return $this->post(
-            "api/notifications/rxchange/patients/{$patientId}/{$rxChangeId}/reconcile",
-            $payload,
-        );
-    }
-
-    /**
-     * POST /api/notifications/rxchange/patients/{patientId}/{rxChangeId}/reconcileOnBehalfOf/{onBehalfOf}
-     */
-    public function reconcileOnBehalfOf(
-        int $patientId,
-        int $rxChangeId,
-        int $onBehalfOf,
-        array $payload = [],
+    public function pending(
+        \BackedEnum|string|null $clinic = null,
+        ?int $patientId = null,
+        ?int $pageNumber = null,
     ): array {
-        return $this->post(
-            "api/notifications/rxchange/patients/{$patientId}/{$rxChangeId}/reconcileOnBehalfOf/{$onBehalfOf}",
-            $payload,
-        );
+        return $this->get('api/rxchanges/pending', [
+            'clinic' => $clinic,
+            'patientId' => $patientId,
+            'pageNumber' => $pageNumber,
+        ]);
     }
 
     /**
-     * POST /api/notifications/rxchange/{rxChangeId}/changePatient
+     * GET /api/rxchanges/pending/detailed
+     *
+     * Get Clinician's Rx Change requests for clinic(s)/patient.
+     * clinic is All or Current.
+     *
+     * @dosespot RxChanges_GetRxChangeQueueDetailedV2
+     */
+    public function pendingDetailed(
+        \BackedEnum|string|null $clinic = null,
+        ?int $patientId = null,
+        ?int $pageNumber = null,
+    ): array {
+        return $this->get('api/rxchanges/pending/detailed', [
+            'clinic' => $clinic,
+            'patientId' => $patientId,
+            'pageNumber' => $pageNumber,
+        ]);
+    }
+
+    /**
+     * POST /api/rxchanges/{rxChangeId}/approve
+     *
+     * Approves a pending rxChange request.
+     *
+     * @dosespot RxChanges_ApproveRxChangeV2
+     */
+    public function approve(int $rxChangeId, array $payload): array
+    {
+        return $this->post("api/rxchanges/{$rxChangeId}/approve", $payload);
+    }
+
+    /**
+     * POST /api/rxchanges/{rxChangeId}/deny
+     *
+     * Denies a pending rxChange request.
+     *
+     * @dosespot RxChanges_DenyRxChangeV2
+     */
+    public function deny(int $rxChangeId, array $payload): array
+    {
+        return $this->post("api/rxchanges/{$rxChangeId}/deny", $payload);
+    }
+
+    /**
+     * POST /api/rxchanges/{rxChangeId}/patients/{patientId}/reconcile
+     *
+     * Reconcile Rx. Change.
+     *
+     * @dosespot RxChanges_ReconcileRxChangeV2
+     */
+    public function reconcile(int $rxChangeId, int $patientId, int $referencedPrescriptionId): array
+    {
+        return $this->post("api/rxchanges/{$rxChangeId}/patients/{$patientId}/reconcile", [
+            'ReferencedPrescriptionId' => $referencedPrescriptionId,
+        ]);
+    }
+
+    /**
+     * PATCH /api/rxchanges/{rxChangeId}/changePatient
+     *
+     * Change patient details in a rxchange request.
+     *
+     * @dosespot RxChanges_ChangeRxChangeRequestPatientV2
      */
     public function changePatient(int $rxChangeId, array $payload): array
     {
-        return $this->post("api/notifications/rxchange/{$rxChangeId}/changePatient", $payload);
-    }
-
-    /**
-     * POST /api/notifications/rxchange/{rxChangeId}/changePatientOnBehalfOf/{patientId}/{onBehalfOf}
-     */
-    public function changePatientOnBehalfOf(int $rxChangeId, int $patientId, int $onBehalfOf): array
-    {
-        return $this->post(
-            "api/notifications/rxchange/{$rxChangeId}/changePatientOnBehalfOf/{$patientId}/{$onBehalfOf}",
-        );
-    }
-
-    /**
-     * POST /api/notifications/rxchange/{rxChangeId}/approve
-     */
-    public function approve(int $rxChangeId, array $payload = []): array
-    {
-        return $this->post("api/notifications/rxchange/{$rxChangeId}/approve", $payload);
-    }
-
-    /**
-     * POST /api/notifications/rxchange/{rxChangeId}/approveOnBehalfOf/{onBehalfOf}
-     */
-    public function approveOnBehalfOf(int $rxChangeId, int $onBehalfOf, array $payload = []): array
-    {
-        return $this->post(
-            "api/notifications/rxchange/{$rxChangeId}/approveOnBehalfOf/{$onBehalfOf}",
-            $payload,
-        );
-    }
-
-    /**
-     * POST /api/notifications/rxchange/{rxChangeId}/deny
-     */
-    public function deny(int $rxChangeId, array $payload = []): array
-    {
-        return $this->post("api/notifications/rxchange/{$rxChangeId}/deny", $payload);
-    }
-
-    /**
-     * POST /api/notifications/rxchange/{rxChangeId}/denyOnBehalfOf/{onBehalfOf}
-     */
-    public function denyOnBehalfOf(int $rxChangeId, int $onBehalfOf, array $payload = []): array
-    {
-        return $this->post(
-            "api/notifications/rxchange/{$rxChangeId}/denyOnBehalfOf/{$onBehalfOf}",
-            $payload,
-        );
+        return $this->patch("api/rxchanges/{$rxChangeId}/changePatient", $payload);
     }
 }

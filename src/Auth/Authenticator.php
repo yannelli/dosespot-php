@@ -17,7 +17,6 @@ final class Authenticator
     public function __construct(
         private readonly Config $config,
         private readonly ClientInterface $httpClient,
-        private readonly KeyGenerator $keyGenerator = new KeyGenerator(),
     ) {
     }
 
@@ -40,28 +39,29 @@ final class Authenticator
         $this->cachedToken = $token;
     }
 
+    /**
+     * DoseSpot v2 token grant. The password is the clinic key, not a user password.
+     *
+     * @see https://my.dosespot.com/webapi/v2/connect/token
+     */
     private function requestToken(): AccessToken
     {
-        $password = $this->keyGenerator->generate($this->config->clinicKey);
-
         $form = [
             'grant_type' => 'password',
-            'Username' => $this->config->clinicId,
-            'Password' => $password,
+            'client_id' => $this->config->clinicId,
+            'client_secret' => $this->config->clinicKey,
+            'username' => (string) $this->config->userId,
+            'password' => $this->config->clinicKey,
+            'scope' => 'api',
         ];
-
-        $headers = [
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/x-www-form-urlencoded',
-        ];
-
-        if ($this->config->userId !== null) {
-            $headers['X-DoseSpot-UserId'] = (string) $this->config->userId;
-        }
 
         try {
             $response = $this->httpClient->request('POST', $this->config->tokenUrl(), [
-                RequestOptions::HEADERS => $headers,
+                RequestOptions::HEADERS => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Subscription-Key' => $this->config->subscriptionKey,
+                ],
                 RequestOptions::FORM_PARAMS => $form,
                 RequestOptions::HTTP_ERRORS => false,
                 RequestOptions::TIMEOUT => $this->config->timeout,

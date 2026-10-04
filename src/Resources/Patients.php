@@ -9,18 +9,20 @@ class Patients extends Resource
     /**
      * GET /api/patients/search
      *
-     * Search patients by name and/or date of birth.
+     * Search Patients. Status is InactiveOnly, ActiveOnly, or Both.
+     *
+     * @dosespot Patients_SearchPatientsV2
      */
     public function search(
         ?string $firstName = null,
         ?string $lastName = null,
         \DateTimeInterface|string|null $dob = null,
-        ?string $status = null,
+        \BackedEnum|string|null $status = null,
         ?int $pageNumber = null,
     ): array {
         return $this->get('api/patients/search', [
-            'firstname' => $firstName,
-            'lastname' => $lastName,
+            'firstName' => $firstName,
+            'lastName' => $lastName,
             'dob' => $dob,
             'status' => $status,
             'pageNumber' => $pageNumber,
@@ -29,6 +31,10 @@ class Patients extends Resource
 
     /**
      * GET /api/patients/{patientId}
+     *
+     * Get patient demographics.
+     *
+     * @dosespot Patients_GetPatientDemographicDataV2
      */
     public function find(int $patientId): array
     {
@@ -36,15 +42,11 @@ class Patients extends Resource
     }
 
     /**
-     * GET /api/patients/{patientId}/details
-     */
-    public function details(int $patientId): array
-    {
-        return $this->get("api/patients/{$patientId}/details");
-    }
-
-    /**
      * POST /api/patients
+     *
+     * Add Patient.
+     *
+     * @dosespot Patients_AddPatientV2
      */
     public function create(array $patient): array
     {
@@ -52,102 +54,52 @@ class Patients extends Resource
     }
 
     /**
-     * POST /api/patients/{patientId}
+     * PUT /api/patients/{patientId}
+     *
+     * Edit patient demographics.
+     *
+     * @dosespot Patients_EditPatientDemographicDataV2
      */
     public function update(int $patientId, array $patient): array
     {
-        return $this->post("api/patients/{$patientId}", $patient);
+        return $this->put("api/patients/{$patientId}", $patient);
     }
 
     /**
-     * GET /api/patients/{patientId}/pharmacies
+     * PUT /api/patients/{patientId}/SSN
+     *
+     * Add/Update Patient SSN details.
+     *
+     * @dosespot Patients_AddEditPatientSsnV2
      */
-    public function pharmacies(int $patientId): array
+    public function setSsn(int $patientId, string $ssn): array
     {
-        return $this->get("api/patients/{$patientId}/pharmacies");
-    }
-
-    /**
-     * GET /api/patients/{patientId}/prescriptions
-     */
-    public function prescriptions(
-        int $patientId,
-        \DateTimeInterface|string|null $startDate = null,
-        \DateTimeInterface|string|null $endDate = null,
-    ): array {
-        return $this->get("api/patients/{$patientId}/prescriptions", [
-            'startDate' => $startDate,
-            'endDate' => $endDate,
+        return $this->put("api/patients/{$patientId}/SSN", [
+            'PatientSSN' => $ssn,
         ]);
     }
 
     /**
-     * GET /api/patients/{patientId}/selfReportedMedications
+     * DELETE /api/patients/{patientId}/SSN
+     *
+     * Delete patient's SSN.
+     *
+     * @dosespot Patients_DeletePatientSSNV2
      */
-    public function selfReportedMedications(
-        int $patientId,
-        \DateTimeInterface|string|null $startDate = null,
-        \DateTimeInterface|string|null $endDate = null,
-    ): array {
-        return $this->get("api/patients/{$patientId}/selfReportedMedications", [
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-        ]);
-    }
-
-    /**
-     * GET /api/patients/{patientId}/clinics
-     */
-    public function clinics(int $patientId): array
+    public function deleteSsn(int $patientId): array
     {
-        return $this->get("api/patients/{$patientId}/clinics");
-    }
-
-    /**
-     * GET /api/patients/{patientId}/clinicians
-     */
-    public function clinicians(int $patientId): array
-    {
-        return $this->get("api/patients/{$patientId}/clinicians");
+        return $this->delete("api/patients/{$patientId}/SSN");
     }
 
     /**
      * POST /api/patients/merge
+     *
+     * Merge patient's medications and allergies.
+     *
+     * @dosespot Patients_MergePatientsV2
      */
     public function merge(array $payload): array
     {
         return $this->post('api/patients/merge', $payload);
-    }
-
-    /**
-     * POST /api/patients/{patientId}/logMedicationHistoryConsent
-     */
-    public function logMedicationHistoryConsent(int $patientId, array $payload): array
-    {
-        return $this->post("api/patients/{$patientId}/logMedicationHistoryConsent", $payload);
-    }
-
-    /**
-     * POST /api/patients/{patientId}/precheckInteractions
-     */
-    public function precheckInteractions(int $patientId, array $payload): array
-    {
-        return $this->post("api/patients/{$patientId}/precheckInteractions", $payload);
-    }
-
-    /**
-     * POST /api/patients/{patientId}/transfer
-     */
-    public function transfer(int $patientId, array $payload): array
-    {
-        return $this->post("api/patients/{$patientId}/transfer", $payload);
-    }
-
-    /**
-     * POST /api/patients/{patientId}/insurance
-     */
-    public function setInsurance(int $patientId, array $payload): array
-    {
-        return $this->post("api/patients/{$patientId}/insurance", $payload);
     }
 }

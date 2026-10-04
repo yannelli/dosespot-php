@@ -8,36 +8,39 @@ class Eligibilities extends Resource
 {
     /**
      * GET /api/patients/{patientId}/eligibilities
+     *
+     * Get patient's insurance information.
+     *
+     * @dosespot Eligibilities_GetPayerInformationV2
      */
-    public function forPatient(int $patientId): array
+    public function forPatient(int $patientId, ?int $clinicId = null): array
     {
-        return $this->get("api/patients/{$patientId}/eligibilities");
-    }
-
-    /**
-     * GET /api/patients/{patientId}/therapeuticAlternatives
-     */
-    public function therapeuticAlternatives(int $patientId, int $patientEligibilityId, string $ndc): array
-    {
-        return $this->get("api/patients/{$patientId}/therapeuticAlternatives", [
-            'patientEligibilityId' => $patientEligibilityId,
-            'ndc' => $ndc,
+        return $this->get("api/patients/{$patientId}/eligibilities", [
+            'clinicId' => $clinicId,
         ]);
     }
 
     /**
      * GET /api/patients/{patientId}/formulary
+     *
+     * Get patient's medication coverage.
+     *
+     * @dosespot Eligibilities_GetMedicationCoverageV2
      */
     public function formulary(int $patientId, int $patientEligibilityId, string $ndc): array
     {
         return $this->get("api/patients/{$patientId}/formulary", [
             'patientEligibilityId' => $patientEligibilityId,
-            'ndc' => $ndc,
+            'nDC' => $ndc,
         ]);
     }
 
     /**
      * GET /api/patients/{patientId}/prescriptionbenefits
+     *
+     * Get prescription benefits.
+     *
+     * @dosespot Eligibilities_GetPrescriptionBenefitsV2
      */
     public function prescriptionBenefits(
         int $patientId,
@@ -46,7 +49,7 @@ class Eligibilities extends Resource
         float|int $quantity,
         int $daysSupply,
         int $dispenseUnitTypeId,
-        int $patientEligibilityId,
+        ?int $patientEligibilityId = null,
     ): array {
         return $this->get("api/patients/{$patientId}/prescriptionbenefits", [
             'ndc' => $ndc,
@@ -56,5 +59,17 @@ class Eligibilities extends Resource
             'dispenseUnitTypeID' => $dispenseUnitTypeId,
             'patientEligibilityId' => $patientEligibilityId,
         ]);
+    }
+
+    /**
+     * POST /api/patients/{patientId}/insurance
+     *
+     * Add custom insurance info.
+     *
+     * @dosespot Eligibilities_CustomInsuranceInfoV2
+     */
+    public function setInsurance(int $patientId, array $payload): array
+    {
+        return $this->post("api/patients/{$patientId}/insurance", $payload);
     }
 }

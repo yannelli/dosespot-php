@@ -38,9 +38,13 @@ it('sends clinic credentials in the form body', function () {
     parse_str((string) $request->getBody(), $form);
 
     expect($form['grant_type'])->toBe('password');
-    expect($form['Username'])->toBe('12345');
-    expect($form['Password'])->toBeString()->not->toBeEmpty();
-    expect($request->getHeaderLine('X-DoseSpot-UserId'))->toBe('42');
+    expect($form['client_id'])->toBe('12345');
+    expect($form['client_secret'])->toBe('super-secret-clinic-key-1234567890');
+    expect($form['username'])->toBe('42');
+    expect($form['password'])->toBe('super-secret-clinic-key-1234567890');
+    expect($form['scope'])->toBe('api');
+    expect($request->getHeaderLine('Subscription-Key'))->toBe('subscription-key');
+    expect($request->getUri()->getPath())->toBe('/webapi/v2/connect/token');
 });
 
 it('throws an AuthenticationException when the token request fails', function () {
@@ -127,20 +131,16 @@ it('forgets a cached token on demand', function () {
     expect($auth->token()->token)->toBe('second');
 });
 
-it('omits the user id header when config has no user id', function () {
+it('sends the clinician id as the password-grant username', function () {
     $factory = factory();
     $factory->pushToken();
 
-    $config = new Config(
-        clinicId: '12345',
-        clinicKey: 'super-secret-clinic-key-1234567890',
-        environment: Environment::Staging,
-    );
+    (new Authenticator($factory->config(), $factory->guzzle()))->token();
 
-    (new Authenticator($config, $factory->guzzle()))->token();
+    parse_str((string) $factory->lastRequest()->getBody(), $form);
 
-    $request = $factory->lastRequest();
-    expect($request->hasHeader('X-DoseSpot-UserId'))->toBeFalse();
+    expect($form['username'])->toBe('42');
+    expect($factory->lastRequest()->hasHeader('X-DoseSpot-UserId'))->toBeFalse();
 });
 
 it('prefers userId from the token response over the config value', function () {
@@ -171,23 +171,6 @@ it('falls back to the configured user id when the token response omits userId', 
     expect($token->userId)->toBe(42);
 });
 
-it('leaves userId null when neither the response nor config provides one', function () {
-    $factory = factory();
-    $factory->pushToken('no-user-token');
-
-    $config = new Config(
-        clinicId: '12345',
-        clinicKey: 'super-secret-clinic-key-1234567890',
-        environment: Environment::Staging,
-    );
-
-    $auth = new Authenticator($config, $factory->guzzle());
-    $token = $auth->token();
-
-    expect($token->token)->toBe('no-user-token');
-    expect($token->userId)->toBeNull();
-});
-
 it('defaults token_type to Bearer and expires_in to 3600 when omitted', function () {
     $factory = factory();
     $factory->pushResponse(200, [
@@ -214,6 +197,7 @@ it('forwards configured timeouts to token requests', function () {
     $config = new Config(
         clinicId: '12345',
         clinicKey: 'super-secret-clinic-key-1234567890',
+        subscriptionKey: 'subscription-key',
         environment: Environment::Staging,
         userId: 42,
         timeout: 21,
@@ -264,27 +248,6 @@ it('falls back to an HTTP status message when the token response body is not a J
 
     expect(fn () => $auth->token())
         ->toThrow(AuthenticationException::class, 'DoseSpot token request failed with HTTP 500');
-});
-
-it('uses a custom KeyGenerator for the token password grant', function () {
-    $factory = factory();
-    $factory->pushToken('custom-key-token');
-
-    $generator = new class () extends \Yannelli\DoseSpot\Auth\KeyGenerator {
-        public function generate(string $clinicKey, ?string $seed = null): string
-        {
-            return 'deterministic-custom-password-from-test';
-        }
-    };
-
-    (new Authenticator($factory->config(), $factory->guzzle(), $generator))->token();
-
-    $request = $factory->lastRequest();
-    parse_str((string) $request->getBody(), $form);
-
-    expect($form['Password'])->toBe('deterministic-custom-password-from-test');
-    expect($form['grant_type'])->toBe('password');
-    expect($form['Username'])->toBe('12345');
 });
 
 it('falls back to an HTTP status message when the JSON error object has no known keys', function () {
@@ -379,7 +342,7 @@ it('refreshes the token when only the expiry leeway remains', function () {
     expect($token->token)->toBe('post-leeway');
     expect($token)->not->toBe($withinLeeway);
     expect($factory->history)->toHaveCount(1);
-    expect($factory->lastRequest()->getUri()->getPath())->toBe('/webapi/token');
+    expect($factory->lastRequest()->getUri()->getPath())->toBe('/webapi/v2/connect/token');
 });
 
 it('falls through blank or whitespace token error fields to the next useful value', function () {

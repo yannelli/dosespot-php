@@ -39,9 +39,14 @@ final class HttpClient
         return $this->request('PUT', $path, body: $body, query: $query);
     }
 
-    public function delete(string $path, array $query = []): Response
+    public function patch(string $path, ?array $body = null, array $query = []): Response
     {
-        return $this->request('DELETE', $path, query: $query);
+        return $this->request('PATCH', $path, body: $body, query: $query);
+    }
+
+    public function delete(string $path, array $query = [], ?array $body = null): Response
+    {
+        return $this->request('DELETE', $path, body: $body, query: $query);
     }
 
     public function request(string $method, string $path, ?array $body = null, array $query = []): Response
@@ -52,14 +57,17 @@ final class HttpClient
             RequestOptions::HEADERS => [
                 'Authorization' => $token->authorizationHeader(),
                 'Accept' => 'application/json',
+                'Subscription-Key' => $this->config->subscriptionKey,
             ],
             RequestOptions::HTTP_ERRORS => false,
             RequestOptions::TIMEOUT => $this->config->timeout,
             RequestOptions::CONNECT_TIMEOUT => $this->config->connectTimeout,
         ];
 
-        if ($query !== []) {
-            $options[RequestOptions::QUERY] = $this->normalizeQuery($query);
+        $queryString = $this->encodeQuery($query);
+
+        if ($queryString !== '') {
+            $options[RequestOptions::QUERY] = $queryString;
         }
 
         if ($body !== null) {
@@ -82,61 +90,108 @@ final class HttpClient
             $this->throwForStatus($response);
         }
 
+        $this->throwIfResultFailed($response);
+
         return $response;
     }
 
-    private function normalizeQuery(array $query): array
+    /**
+     * Encode query parameters the way DoseSpot's swagger describes them.
+     *
+     * Sequential arrays use collectionFormat "multi" (repeated keys).
+     * Associative arrays use bracket notation. Nulls are omitted.
+     *
+     * @param  list<string>  $pairs
+     */
+    private function encodeQuery(array $query): string
     {
-        $out = [];
+        $pairs = [];
 
         foreach ($query as $key => $value) {
-            $normalized = $this->normalizeQueryValue($value);
-
-            if ($normalized === null) {
-                continue;
-            }
-
-            $out[$key] = $normalized;
+            $this->appendQueryValue($pairs, (string) $key, $value);
         }
 
-        return $out;
+        return implode('&', $pairs);
     }
 
-    private function normalizeQueryValue(mixed $value): mixed
+    /**
+     * @param  list<string>  $pairs
+     */
+    private function appendQueryValue(array &$pairs, string $key, mixed $value): void
     {
         if ($value === null) {
-            return null;
+            return;
         }
 
         if ($value instanceof \DateTimeInterface) {
-            return $value->format('Y-m-d\TH:i:s');
+            $pairs[] = rawurlencode($key).'='.rawurlencode($value->format('Y-m-d\TH:i:s'));
+
+            return;
         }
 
         if ($value instanceof \BackedEnum) {
-            return $value->value;
+            $pairs[] = rawurlencode($key).'='.rawurlencode((string) $value->value);
+
+            return;
         }
 
         if (is_bool($value)) {
-            return $value ? 'true' : 'false';
+            $pairs[] = rawurlencode($key).'='.($value ? 'true' : 'false');
+
+            return;
         }
 
         if (is_array($value)) {
-            $out = [];
-
-            foreach ($value as $key => $item) {
-                $normalized = $this->normalizeQueryValue($item);
-
-                if ($normalized === null) {
-                    continue;
+            if ($this->isSequence($value)) {
+                foreach ($value as $item) {
+                    $this->appendQueryValue($pairs, $key, $item);
                 }
 
-                $out[$key] = $normalized;
+                return;
             }
 
-            return $out;
+            foreach ($value as $childKey => $child) {
+                $this->appendQueryValue($pairs, $key.'['.$childKey.']', $child);
+            }
+
+            return;
         }
 
-        return $value;
+        $pairs[] = rawurlencode($key).'='.rawurlencode((string) $value);
+    }
+
+    private function isSequence(array $value): bool
+    {
+        foreach (array_keys($value) as $index) {
+            if (! is_int($index)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function throwIfResultFailed(Response $response): void
+    {
+        $decoded = $response->json();
+        $result = $decoded['Result'] ?? null;
+
+        if (! is_array($result) || ! array_key_exists('ResultCode', $result)) {
+            return;
+        }
+
+        $code = trim((string) $result['ResultCode']);
+
+        if ($code === '' || strcasecmp($code, 'OK') === 0) {
+            return;
+        }
+
+        throw new ApiException(
+            $this->extractMessage($decoded, $response->body(), $response->statusCode()),
+            $response->statusCode(),
+            $decoded,
+            $response->body(),
+        );
     }
 
     private function throwForStatus(Response $response): never

@@ -1,0 +1,882 @@
+{
+  "source": "https://my.dosespot.com/webapi/v2/swagger/docs/Full_EPCSV2",
+  "specVersion": "Full_EPCSV2",
+  "retrieved": "2026-09-29",
+  "operations": [
+    {
+      "operationId": "Allergens_AllergenSearchV2",
+      "method": "GET",
+      "path": "/api/allergens/search"
+    },
+    {
+      "operationId": "Allergens_GetAllergenByIDV2",
+      "method": "GET",
+      "path": "/api/allergens/{allergenId}"
+    },
+    {
+      "operationId": "Allergens_SearchByRxCUI",
+      "method": "GET",
+      "path": "/api/allergens/searchByRxCUI"
+    },
+    {
+      "operationId": "Allergies_AddCodedPatientAllergyV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/allergies/coded"
+    },
+    {
+      "operationId": "Allergies_AddFreetextPatientAllergyV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/allergies/freetext"
+    },
+    {
+      "operationId": "Allergies_AddNoKnownPatientAllergyV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/allergies/noKnownAllergy"
+    },
+    {
+      "operationId": "Allergies_EditPatientAllergyV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/allergies/{patientAllergyId}"
+    },
+    {
+      "operationId": "Allergies_GetPatientAllergiesV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/allergies"
+    },
+    {
+      "operationId": "ClinicFavorites_AddClinicCodedMedicationFavoriteV2",
+      "method": "POST",
+      "path": "/api/clinics/{clinicId}/prescriptionFavorites/coded"
+    },
+    {
+      "operationId": "ClinicFavorites_AddClinicCompiledCompoundFavoriteV2",
+      "method": "POST",
+      "path": "/api/clinics/{clinicId}/prescriptionFavorites/compiledcompound"
+    },
+    {
+      "operationId": "ClinicFavorites_AddClinicSupplyFavoriteV2",
+      "method": "POST",
+      "path": "/api/clinics/{clinicId}/prescriptionFavorites/supply"
+    },
+    {
+      "operationId": "ClinicFavorites_EditClinicCodedMedicationFavoriteV2",
+      "method": "PUT",
+      "path": "/api/clinics/{clinicId}/prescriptionFavorites/coded/{favoriteId}"
+    },
+    {
+      "operationId": "ClinicFavorites_EditClinicCompiledCompoundFavoriteV2",
+      "method": "PUT",
+      "path": "/api/clinics/{clinicId}/prescriptionFavorites/compiledcompound/{favoriteId}"
+    },
+    {
+      "operationId": "ClinicFavorites_EditClinicSupplyFavoriteV2",
+      "method": "PUT",
+      "path": "/api/clinics/{clinicId}/prescriptionFavorites/supply/{favoriteId}"
+    },
+    {
+      "operationId": "ClinicFavorites_GetClinicPrescriptionFavoritesV2",
+      "method": "GET",
+      "path": "/api/clinics/{clinicId}/prescriptionFavorites"
+    },
+    {
+      "operationId": "ClinicGroups_AddEditClinicGroupV2",
+      "method": "POST",
+      "path": "/api/clinicGroups"
+    },
+    {
+      "operationId": "ClinicOrderSets_GetClinicOrderSets",
+      "method": "GET",
+      "path": "/api/clinic/ordersets"
+    },
+    {
+      "operationId": "ClinicianFavorites_AddClinicianCompiledCompoundFavoriteV2",
+      "method": "POST",
+      "path": "/api/clinicians/prescriptionFavorites/compiledcompound"
+    },
+    {
+      "operationId": "ClinicianFavorites_AddClinicianPrescriptionFavoriteV2",
+      "method": "POST",
+      "path": "/api/clinicians/prescriptionFavorites/coded"
+    },
+    {
+      "operationId": "ClinicianFavorites_AddClinicianSupplyFavoriteV2",
+      "method": "POST",
+      "path": "/api/clinicians/prescriptionFavorites/supply"
+    },
+    {
+      "operationId": "ClinicianFavorites_DeleteClinicianFavoriteV2",
+      "method": "DELETE",
+      "path": "/api/clinicians/prescriptionFavorites"
+    },
+    {
+      "operationId": "ClinicianFavorites_EditClinicianCodedPrescriptionFavoriteV2",
+      "method": "PUT",
+      "path": "/api/clinicians/prescriptionFavorites/coded/{favoriteId}"
+    },
+    {
+      "operationId": "ClinicianFavorites_EditClinicianCompiledCompoundFavoriteV2",
+      "method": "PUT",
+      "path": "/api/clinicians/prescriptionFavorites/compiledcompound/{favoriteId}"
+    },
+    {
+      "operationId": "ClinicianFavorites_EditClinicianSupplyFavoriteV2",
+      "method": "PUT",
+      "path": "/api/clinicians/prescriptionFavorites/supply/{favoriteId}"
+    },
+    {
+      "operationId": "ClinicianFavorites_GetClinicianPrescriptionFavoritesV2",
+      "method": "GET",
+      "path": "/api/clinicians/{clinicianId}/prescriptionFavorites"
+    },
+    {
+      "operationId": "ClinicianOrderSets_AddClinicianOrderSetV2",
+      "method": "POST",
+      "path": "/api/clinicians/ordersets"
+    },
+    {
+      "operationId": "ClinicianOrderSets_DeleteClinicianOrderSetV2",
+      "method": "DELETE",
+      "path": "/api/clinicians/ordersets/{orderSetId}"
+    },
+    {
+      "operationId": "ClinicianOrderSets_GetClinicianOrderSetDetailsV2",
+      "method": "GET",
+      "path": "/api/clinicians/ordersets/{orderSetId}/details"
+    },
+    {
+      "operationId": "ClinicianOrderSets_GetClinicianOrderSetsV2",
+      "method": "GET",
+      "path": "/api/clinicians/ordersets"
+    },
+    {
+      "operationId": "ClinicianOrderSets_UpdateClinicianOrderSetV2",
+      "method": "PUT",
+      "path": "/api/clinicians/ordersets/{orderSetId}"
+    },
+    {
+      "operationId": "Clinicians_AcceptAgreementV2",
+      "method": "POST",
+      "path": "/api/clinicians/acceptAgreement"
+    },
+    {
+      "operationId": "Clinicians_AcceptIdentityProofingDisclaimerV2",
+      "method": "POST",
+      "path": "/api/clinicians/idpDisclaimer"
+    },
+    {
+      "operationId": "Clinicians_AddSupervisorToClinicianV2",
+      "method": "PUT",
+      "path": "/api/clinicians/{clinicianId}/supervisors"
+    },
+    {
+      "operationId": "Clinicians_ChangePinV2",
+      "method": "PUT",
+      "path": "/api/clinicians/pin"
+    },
+    {
+      "operationId": "Clinicians_ClinicianAddV2",
+      "method": "POST",
+      "path": "/api/clinicians"
+    },
+    {
+      "operationId": "Clinicians_ClinicianCheckRegistrationStatusV2",
+      "method": "GET",
+      "path": "/api/clinicians/{clinicianId}/registrationStatus"
+    },
+    {
+      "operationId": "Clinicians_ClinicianIdentityProofingAnswersV2",
+      "method": "POST",
+      "path": "/api/clinicians/idpAnswers"
+    },
+    {
+      "operationId": "Clinicians_ClinicianIdentityProofingOneTimeCodeV2",
+      "method": "POST",
+      "path": "/api/clinicians/idpOtp"
+    },
+    {
+      "operationId": "Clinicians_ClinicianIdentityProofingV2",
+      "method": "POST",
+      "path": "/api/clinicians/idp"
+    },
+    {
+      "operationId": "Clinicians_DeleteSupervisorToClinicianV2",
+      "method": "DELETE",
+      "path": "/api/clinicians/{clinicianId}/supervisors"
+    },
+    {
+      "operationId": "Clinicians_GetClinicianByNpiOrDeaV2",
+      "method": "GET",
+      "path": "/api/clinician"
+    },
+    {
+      "operationId": "Clinicians_GetClinicianDetailsByIdV2",
+      "method": "GET",
+      "path": "/api/clinicians/{clinicianId}"
+    },
+    {
+      "operationId": "Clinicians_GetClinicianLegalAgreementsV2",
+      "method": "GET",
+      "path": "/api/clinicians/{clinicianId}/legalAgreements"
+    },
+    {
+      "operationId": "Clinicians_GetClinicianPDMPV2",
+      "method": "GET",
+      "path": "/api/clinicians/pdmp"
+    },
+    {
+      "operationId": "Clinicians_GetIdentityProofingDisclaimerV2",
+      "method": "GET",
+      "path": "/api/clinicians/idpDisclaimer"
+    },
+    {
+      "operationId": "Clinicians_GetPatientCliniciansV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/clinicians"
+    },
+    {
+      "operationId": "Clinicians_GetPrescriptionPrescriberInfoAPIV2",
+      "method": "GET",
+      "path": "/api/prescriptions/{prescriptionId}/prescriberInfo"
+    },
+    {
+      "operationId": "Clinicians_InitializeIDPV2",
+      "method": "POST",
+      "path": "/api/clinicians/{clinicianId}/idpInit"
+    },
+    {
+      "operationId": "Clinicians_InitializeTfaActivationV2",
+      "method": "POST",
+      "path": "/api/clinicians/{clinicianId}/initTfaActivate"
+    },
+    {
+      "operationId": "Clinicians_InitializeTfaDeactivationV2",
+      "method": "POST",
+      "path": "/api/clinicians/{clinicianId}/initTfaDeactivate"
+    },
+    {
+      "operationId": "Clinicians_PutClinicianEditV2",
+      "method": "PUT",
+      "path": "/api/clinicians/{clinicianId}"
+    },
+    {
+      "operationId": "Clinicians_ResetClinicianPinV2",
+      "method": "POST",
+      "path": "/api/clinicians/{clinicianId}/resetPin"
+    },
+    {
+      "operationId": "Clinicians_ResetMyPinV2",
+      "method": "POST",
+      "path": "/api/clinicians/resetPin"
+    },
+    {
+      "operationId": "Clinicians_ResyncTokenV2",
+      "method": "POST",
+      "path": "/api/clinicians/resyncToken"
+    },
+    {
+      "operationId": "Clinicians_SendMobileTfaV2",
+      "method": "POST",
+      "path": "/api/clinicians/sendMobileTfa"
+    },
+    {
+      "operationId": "Clinicians_SetPinV2",
+      "method": "POST",
+      "path": "/api/clinicians/pin"
+    },
+    {
+      "operationId": "Clinicians_TfaActivateV2",
+      "method": "POST",
+      "path": "/api/clinicians/tfaActivate"
+    },
+    {
+      "operationId": "Clinicians_TfaDeactivateV2",
+      "method": "POST",
+      "path": "/api/clinicians/tfaDeactivate"
+    },
+    {
+      "operationId": "Clinics_ClinicAddV2",
+      "method": "POST",
+      "path": "/api/clinics"
+    },
+    {
+      "operationId": "Clinics_ClinicEditV2",
+      "method": "PUT",
+      "path": "/api/clinics/{clinicId}"
+    },
+    {
+      "operationId": "Clinics_ClinicRemoveMultipleCliniciansV2",
+      "method": "DELETE",
+      "path": "/api/clinics/{clinicId}/clinicians"
+    },
+    {
+      "operationId": "Clinics_ClinicianAddMultipleClinicsV2",
+      "method": "POST",
+      "path": "/api/clinicians/{clinicianId}/clinics"
+    },
+    {
+      "operationId": "Clinics_GetClinicDetailsV2",
+      "method": "GET",
+      "path": "/api/clinics/{clinicId}"
+    },
+    {
+      "operationId": "Clinics_GetClinicianClinicsV2",
+      "method": "GET",
+      "path": "/api/clinicians/{clinicianId}/clinicIds"
+    },
+    {
+      "operationId": "Clinics_GetPatientClinicsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/clinics"
+    },
+    {
+      "operationId": "Clinics_PatientClinicTransferV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/transfer"
+    },
+    {
+      "operationId": "DEANumbers_AddDEANumber",
+      "method": "POST",
+      "path": "/api/clinicians/{clinicianId}/deanumbers"
+    },
+    {
+      "operationId": "DEANumbers_DeleteDEANumber",
+      "method": "DELETE",
+      "path": "/api/clinicians/{clinicianId}/deanumbers/{deanumberId}"
+    },
+    {
+      "operationId": "DEANumbers_EditDEANumber",
+      "method": "PUT",
+      "path": "/api/clinicians/{clinicianId}/deanumbers/{deanumberId}"
+    },
+    {
+      "operationId": "DEANumbers_GetDEANumber",
+      "method": "GET",
+      "path": "/api/clinicians/{clinicianId}/deanumbers/{deanumberId}"
+    },
+    {
+      "operationId": "DEANumbers_GetDEANumbers",
+      "method": "GET",
+      "path": "/api/clinicians/{clinicianId}/deanumbers"
+    },
+    {
+      "operationId": "Diagnoses_DiagnosisSearchV2",
+      "method": "GET",
+      "path": "/api/diagnoses/search"
+    },
+    {
+      "operationId": "Eligibilities_CustomInsuranceInfoV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/insurance"
+    },
+    {
+      "operationId": "Eligibilities_GetMedicationCoverageV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/formulary"
+    },
+    {
+      "operationId": "Eligibilities_GetPayerInformationV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/eligibilities"
+    },
+    {
+      "operationId": "Eligibilities_GetPrescriptionBenefitsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/prescriptionbenefits"
+    },
+    {
+      "operationId": "HealthCheck_CheckHealthV2",
+      "method": "GET",
+      "path": "/api/general/check"
+    },
+    {
+      "operationId": "Interactions_GetAllergyInteractionsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/interactions/allergies"
+    },
+    {
+      "operationId": "Interactions_GetDrugInteractionsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/interactions/drugs"
+    },
+    {
+      "operationId": "Interactions_GetPreCheckInteractionsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/interactions/precheck/{dispensableDrugId}"
+    },
+    {
+      "operationId": "MedicationHistory_GetMedicationHistoryV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/medications/history"
+    },
+    {
+      "operationId": "MedicationHistory_LogPatientMedicationHistoryConsentV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/medications/history/consent"
+    },
+    {
+      "operationId": "Medications_GetDrugMonographV2",
+      "method": "GET",
+      "path": "/api/medications/monograph"
+    },
+    {
+      "operationId": "Medications_GetStandardDispenseUnitByIDV2",
+      "method": "GET",
+      "path": "/api/dispenseUnits/{dispenseUnitId}"
+    },
+    {
+      "operationId": "Medications_GetStandardDispenseUnitsV2",
+      "method": "GET",
+      "path": "/api/dispenseUnits"
+    },
+    {
+      "operationId": "Medications_MedicationSearchRxCUIV2",
+      "method": "GET",
+      "path": "/api/medications/searchByRxCUI"
+    },
+    {
+      "operationId": "Medications_MedicationSearchV2",
+      "method": "GET",
+      "path": "/api/medications/search"
+    },
+    {
+      "operationId": "Medications_MedicationSelectV2",
+      "method": "GET",
+      "path": "/api/medications/select"
+    },
+    {
+      "operationId": "Narx_GetLatestNarxV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/narx/latest"
+    },
+    {
+      "operationId": "Narx_GetPatientNarxReportLinkV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/narx/report"
+    },
+    {
+      "operationId": "Narx_GetPatientNarxReportV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/narx"
+    },
+    {
+      "operationId": "Notifications_GetPrescriberNotificationCountsV2",
+      "method": "GET",
+      "path": "/api/notifications/counts"
+    },
+    {
+      "operationId": "Notifications_GetTransmissionErrorDetailsV2",
+      "method": "GET",
+      "path": "/api/notifications/errors"
+    },
+    {
+      "operationId": "PatientDiagnoses_AddPatientDiagnosisV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/diagnoses"
+    },
+    {
+      "operationId": "PatientDiagnoses_DeletePatientDiagnosisV2",
+      "method": "DELETE",
+      "path": "/api/patients/{patientId}/diagnoses/{patientDiagnosisId}"
+    },
+    {
+      "operationId": "PatientDiagnoses_EditPatientDiagnosisV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/diagnoses/{patientDiagnosisId}"
+    },
+    {
+      "operationId": "PatientDiagnoses_GetPatientDiagnosesV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/diagnoses"
+    },
+    {
+      "operationId": "PatientDiagnoses_SearchPatientDiagnosesV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/diagnoses/search"
+    },
+    {
+      "operationId": "Patients_AddEditPatientSsnV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/SSN"
+    },
+    {
+      "operationId": "Patients_AddPatientV2",
+      "method": "POST",
+      "path": "/api/patients"
+    },
+    {
+      "operationId": "Patients_DeletePatientSSNV2",
+      "method": "DELETE",
+      "path": "/api/patients/{patientId}/SSN"
+    },
+    {
+      "operationId": "Patients_EditPatientDemographicDataV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}"
+    },
+    {
+      "operationId": "Patients_GetPatientDemographicDataV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}"
+    },
+    {
+      "operationId": "Patients_MergePatientsV2",
+      "method": "POST",
+      "path": "/api/patients/merge"
+    },
+    {
+      "operationId": "Patients_SearchPatientsV2",
+      "method": "GET",
+      "path": "/api/patients/search"
+    },
+    {
+      "operationId": "Pharmacies_AddPatientPharmacyV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/pharmacies"
+    },
+    {
+      "operationId": "Pharmacies_GetPatientPharmaciesV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/pharmacies"
+    },
+    {
+      "operationId": "Pharmacies_GetPharmacyRestrictionsV2",
+      "method": "GET",
+      "path": "/api/pharmacies/restrictions"
+    },
+    {
+      "operationId": "Pharmacies_GetPharmacyV2",
+      "method": "GET",
+      "path": "/api/pharmacies/{pharmacyId}"
+    },
+    {
+      "operationId": "Pharmacies_PharmacySearchV2",
+      "method": "GET",
+      "path": "/api/pharmacies/search"
+    },
+    {
+      "operationId": "Pharmacies_RemovePatientPharmacyV2",
+      "method": "DELETE",
+      "path": "/api/patients/{patientId}/pharmacies/{pharmacyId}"
+    },
+    {
+      "operationId": "Prescriptions_AddCodedPrescriptionV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/coded"
+    },
+    {
+      "operationId": "Prescriptions_AddCodedSupplyV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/supply"
+    },
+    {
+      "operationId": "Prescriptions_AddCompiledCompoundV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/compiledcompound"
+    },
+    {
+      "operationId": "Prescriptions_AddFreeTextSupplyPrescriptionV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/supply/freetext"
+    },
+    {
+      "operationId": "Prescriptions_CancelPrescriptionV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}/cancel"
+    },
+    {
+      "operationId": "Prescriptions_ChangePrescriptionPharmacyV2",
+      "method": "PATCH",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}/pharmacy"
+    },
+    {
+      "operationId": "Prescriptions_CopyPatientPrescriptionV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}/copy"
+    },
+    {
+      "operationId": "Prescriptions_DeletePrescriptionsV2",
+      "method": "DELETE",
+      "path": "/api/patients/{patientId}/prescriptions"
+    },
+    {
+      "operationId": "Prescriptions_EditCodedPrescriptionV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/prescriptions/coded/{prescriptionId}"
+    },
+    {
+      "operationId": "Prescriptions_EditCodedSupplyV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/prescriptions/supply/{prescriptionId}"
+    },
+    {
+      "operationId": "Prescriptions_EditCompiledCompoundV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/prescriptions/compiledcompound/{prescriptionId}"
+    },
+    {
+      "operationId": "Prescriptions_EditFreeTextSupplyPrescriptionV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/prescriptions/supply/freetext/{prescriptionId}"
+    },
+    {
+      "operationId": "Prescriptions_GetEPCSSuggestionsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}/epcsSuggestions"
+    },
+    {
+      "operationId": "Prescriptions_GetPatientPrescriptionV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}"
+    },
+    {
+      "operationId": "Prescriptions_GetPatientPrescriptionsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/prescriptions"
+    },
+    {
+      "operationId": "Prescriptions_GetPrescriptionLogDetailsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}/log"
+    },
+    {
+      "operationId": "Prescriptions_GetPrescriptionSnapshotV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}/snapshot"
+    },
+    {
+      "operationId": "Prescriptions_IgnoreAlertV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}/ignoreError"
+    },
+    {
+      "operationId": "Prescriptions_SendEpcsPrescriptionsV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/sendEpcs"
+    },
+    {
+      "operationId": "Prescriptions_SendPrescriptionsV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/send"
+    },
+    {
+      "operationId": "Prescriptions_SendToAddressPrescriptionsV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/sendToAddress"
+    },
+    {
+      "operationId": "Prescriptions_SetPrescriptionsPrintedV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/setPrinted"
+    },
+    {
+      "operationId": "Prescriptions_SetPrescriptionsReadyToSignV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/readyToSign"
+    },
+    {
+      "operationId": "Prescriptions_UpdatePrescriptionStatusV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/prescriptions/{prescriptionId}/medicationStatus"
+    },
+    {
+      "operationId": "PriorAuthorizations_AppealCaseV2",
+      "method": "POST",
+      "path": "/api/priorAuths/{priorAuthId}/appeal"
+    },
+    {
+      "operationId": "PriorAuthorizations_ApproveOfflineCaseV2",
+      "method": "POST",
+      "path": "/api/priorAuths/{priorAuthId}/approveOffline"
+    },
+    {
+      "operationId": "PriorAuthorizations_CancelPriorAuthCaseV2",
+      "method": "POST",
+      "path": "/api/priorAuths/{priorAuthId}/cancel"
+    },
+    {
+      "operationId": "PriorAuthorizations_DeleteAttachmentV2",
+      "method": "DELETE",
+      "path": "/api/priorAuths/{priorAuthId}/attachments/{attachmentId}"
+    },
+    {
+      "operationId": "PriorAuthorizations_DenyPACaseV2",
+      "method": "POST",
+      "path": "/api/priorAuths/{priorAuthId}/denied"
+    },
+    {
+      "operationId": "PriorAuthorizations_DownloadAttachmentV2",
+      "method": "GET",
+      "path": "/api/priorAuths/{priorAuthId}/attachments/{attachmentId}"
+    },
+    {
+      "operationId": "PriorAuthorizations_GetInProgressPriorAuthCasesV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/priorAuths"
+    },
+    {
+      "operationId": "PriorAuthorizations_GetPAHistoryV2",
+      "method": "GET",
+      "path": "/api/priorAuths/{priorAuthId}/history"
+    },
+    {
+      "operationId": "PriorAuthorizations_GetPriorAuthorizationStatusLogV2",
+      "method": "GET",
+      "path": "/api/priorAuths/{priorAuthId}/statusLog"
+    },
+    {
+      "operationId": "PriorAuthorizations_GetSinglePriorAuthorizationCaseByIdV2",
+      "method": "GET",
+      "path": "/api/priorAuths/{priorAuthId}"
+    },
+    {
+      "operationId": "PriorAuthorizations_GetSingleQuestionDetailsByIdV2",
+      "method": "GET",
+      "path": "/api/priorAuths/{priorAuthId}/questions/{questionId}"
+    },
+    {
+      "operationId": "PriorAuthorizations_InitiatePriorAuthorizationV2",
+      "method": "POST",
+      "path": "/api/priorAuths/initiate"
+    },
+    {
+      "operationId": "PriorAuthorizations_PAAnswerSingleQuestionV2",
+      "method": "POST",
+      "path": "/api/priorAuths/{priorAuthId}/questions/{questionId}/answer"
+    },
+    {
+      "operationId": "PriorAuthorizations_RemovePriorAuthCaseV2",
+      "method": "POST",
+      "path": "/api/priorAuths/{priorAuthId}/remove"
+    },
+    {
+      "operationId": "PriorAuthorizations_SubmitPAAnswersV2",
+      "method": "POST",
+      "path": "/api/priorAuths/{priorAuthId}/submit"
+    },
+    {
+      "operationId": "PriorAuthorizations_UploadAttachmentV2",
+      "method": "POST",
+      "path": "/api/priorAuths/{priorAuthId}/attachments"
+    },
+    {
+      "operationId": "Refills_ApproveRefillV2",
+      "method": "POST",
+      "path": "/api/refills/{refillId}/approve"
+    },
+    {
+      "operationId": "Refills_ChangeRefillRequestPatientV2",
+      "method": "PATCH",
+      "path": "/api/refills/{refillId}/changePatient"
+    },
+    {
+      "operationId": "Refills_DenyRefillV2",
+      "method": "POST",
+      "path": "/api/refills/{refillId}/deny"
+    },
+    {
+      "operationId": "Refills_GetDetailedRefillRequestsV2",
+      "method": "GET",
+      "path": "/api/refills/pending/detailed"
+    },
+    {
+      "operationId": "Refills_GetRefillRequestDetailsV2",
+      "method": "GET",
+      "path": "/api/refills/pending"
+    },
+    {
+      "operationId": "Refills_ReplaceRefillV2",
+      "method": "POST",
+      "path": "/api/refills/{refillId}/replace"
+    },
+    {
+      "operationId": "RxChanges_ApproveRxChangeV2",
+      "method": "POST",
+      "path": "/api/rxchanges/{rxChangeId}/approve"
+    },
+    {
+      "operationId": "RxChanges_ChangeRxChangeRequestPatientV2",
+      "method": "PATCH",
+      "path": "/api/rxchanges/{rxChangeId}/changePatient"
+    },
+    {
+      "operationId": "RxChanges_DenyRxChangeV2",
+      "method": "POST",
+      "path": "/api/rxchanges/{rxChangeId}/deny"
+    },
+    {
+      "operationId": "RxChanges_GetRxChangeQueueDetailedV2",
+      "method": "GET",
+      "path": "/api/rxchanges/pending/detailed"
+    },
+    {
+      "operationId": "RxChanges_GetRxChangeQueueV2",
+      "method": "GET",
+      "path": "/api/rxchanges/pending"
+    },
+    {
+      "operationId": "RxChanges_ReconcileRxChangeV2",
+      "method": "POST",
+      "path": "/api/rxchanges/{rxChangeId}/patients/{patientId}/reconcile"
+    },
+    {
+      "operationId": "SelfReportedMedications_AddSelfReportedMedicationCodedV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/selfReportedMedications/coded"
+    },
+    {
+      "operationId": "SelfReportedMedications_AddSelfReportedMedicationFreeTextV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/selfReportedMedications/freetext"
+    },
+    {
+      "operationId": "SelfReportedMedications_AddSelfReportedMedicationSimpleV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/selfReportedMedications/simple"
+    },
+    {
+      "operationId": "SelfReportedMedications_EditSelfReportedMedicationCodedV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/selfReportedMedications/coded/{selfReportedMedicationId}"
+    },
+    {
+      "operationId": "SelfReportedMedications_EditSelfReportedMedicationFreeTextV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/selfReportedMedications/freetext/{selfReportedMedicationId}"
+    },
+    {
+      "operationId": "SelfReportedMedications_EditSelfReportedMedicationSimpleV2",
+      "method": "PUT",
+      "path": "/api/patients/{patientId}/selfReportedMedications/simple/{selfReportedMedicationId}"
+    },
+    {
+      "operationId": "SelfReportedMedications_GetPatientSelfReportMedicationDetailsByIdV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/selfReportedMedications/{selfReportedMedicationId}"
+    },
+    {
+      "operationId": "SelfReportedMedications_GetPatientSelfReportMedicationsV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/selfReportedMedications"
+    },
+    {
+      "operationId": "SelfReportedMedications_UpdateSelfReportedMedicationStatusV2",
+      "method": "POST",
+      "path": "/api/patients/{patientId}/selfReportedMedications/{selfReportedMedicationId}/updateStatus"
+    },
+    {
+      "operationId": "Supplies_GetSupplyByIDV2",
+      "method": "GET",
+      "path": "/api/supplies/{supplyId}"
+    },
+    {
+      "operationId": "Supplies_SuppliesSearchV2",
+      "method": "GET",
+      "path": "/api/supplies/search"
+    },
+    {
+      "operationId": "Transparency_AlternativePharmaciesV2",
+      "method": "GET",
+      "path": "/api/patients/{patientId}/transparency/alternativePharmacies"
+    }
+  ]
+}

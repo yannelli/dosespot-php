@@ -9,7 +9,9 @@ class Pharmacies extends Resource
     /**
      * GET /api/pharmacies/{pharmacyId}
      *
-     * Retrieve a pharmacy by id.
+     * Get pharmacy details.
+     *
+     * @dosespot Pharmacies_GetPharmacyV2
      */
     public function find(int $pharmacyId): array
     {
@@ -19,9 +21,11 @@ class Pharmacies extends Resource
     /**
      * GET /api/pharmacies/search
      *
-     * Search the pharmacy directory by any combination of filters.
+     * Search pharmacies. Specialty values are repeated query keys.
      *
-     * @param  list<int>|null  $specialty
+     * @param  list<string|\BackedEnum>|null  $specialty
+     *
+     * @dosespot Pharmacies_PharmacySearchV2
      */
     public function search(
         ?string $name = null,
@@ -31,7 +35,8 @@ class Pharmacies extends Resource
         ?string $address = null,
         ?string $phoneOrFax = null,
         ?array $specialty = null,
-        ?string $ncpdpID = null,
+        ?string $ncpdpId = null,
+        ?int $pageNumber = null,
     ): array {
         return $this->get('api/pharmacies/search', [
             'name' => $name,
@@ -41,27 +46,65 @@ class Pharmacies extends Resource
             'address' => $address,
             'phoneOrFax' => $phoneOrFax,
             'specialty' => $specialty,
-            'ncpdpID' => $ncpdpID,
+            'ncpdpId' => $ncpdpId,
+            'pageNumber' => $pageNumber,
         ]);
     }
 
     /**
-     * POST /api/patients/{patientId}/pharmacies/{pharmacyId}
+     * GET /api/patients/{patientId}/pharmacies
      *
-     * Add a pharmacy to a patient's preferred-pharmacy list.
+     * Get patient's pharmacies.
+     *
+     * @dosespot Pharmacies_GetPatientPharmaciesV2
      */
-    public function addToPatient(int $patientId, int $pharmacyId): array
+    public function forPatient(int $patientId): array
     {
-        return $this->post("api/patients/{$patientId}/pharmacies/{$pharmacyId}");
+        return $this->get("api/patients/{$patientId}/pharmacies");
+    }
+
+    /**
+     * POST /api/patients/{patientId}/pharmacies
+     *
+     * Add Pharmacy to Patient.
+     *
+     * @dosespot Pharmacies_AddPatientPharmacyV2
+     */
+    public function addToPatient(int $patientId, int $pharmacyId, ?bool $setAsPrimary = null): array
+    {
+        $body = ['PharmacyId' => $pharmacyId];
+
+        if ($setAsPrimary !== null) {
+            $body['SetAsPrimary'] = $setAsPrimary;
+        }
+
+        return $this->post("api/patients/{$patientId}/pharmacies", $body);
     }
 
     /**
      * DELETE /api/patients/{patientId}/pharmacies/{pharmacyId}
      *
-     * Remove a pharmacy from a patient's preferred-pharmacy list.
+     * Delete Pharmacy from Patient.
+     *
+     * @dosespot Pharmacies_RemovePatientPharmacyV2
      */
     public function removeFromPatient(int $patientId, int $pharmacyId): array
     {
         return $this->delete("api/patients/{$patientId}/pharmacies/{$pharmacyId}");
+    }
+
+    /**
+     * GET /api/pharmacies/restrictions
+     *
+     * Get Pharmacy Restrictions.
+     *
+     * @dosespot Pharmacies_GetPharmacyRestrictionsV2
+     */
+    public function restrictions(int $dispensableDrugId, ?int $pageNumber = null): array
+    {
+        return $this->get('api/pharmacies/restrictions', [
+            'dispensableDrugId' => $dispensableDrugId,
+            'pageNumber' => $pageNumber,
+        ]);
     }
 }

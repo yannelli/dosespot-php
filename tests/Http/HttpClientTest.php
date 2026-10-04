@@ -28,8 +28,9 @@ it('adds the bearer token to outgoing requests', function () {
     $request = $factory->lastRequest();
     expect($request->getHeaderLine('Authorization'))->toBe('Bearer cached-token');
     expect($request->getHeaderLine('Accept'))->toBe('application/json');
+    expect($request->getHeaderLine('Subscription-Key'))->toBe('subscription-key');
     expect((string) $request->getUri())
-        ->toBe('https://my.staging.dosespot.com/webapi/api/general/check');
+        ->toBe('https://my.staging.dosespot.com/webapi/v2/api/general/check');
 });
 
 it('serializes booleans, datetimes, and skips nulls in query strings', function () {
@@ -75,13 +76,13 @@ it('serializes backed enums in query strings', function () {
     $client = $factory->preauthorizedClient();
 
     $client->http->get('api/general/check', [
-        'status' => \Yannelli\DoseSpot\Enums\PrescriptionStatus::ReadyToSend,
-        'metric' => \Yannelli\DoseSpot\Enums\WeightMetric::Kilograms,
+        'status' => \Yannelli\DoseSpot\Enums\PrescriptionStatus::ReadyToSign,
+        'metric' => \Yannelli\DoseSpot\Enums\WeightMetric::Kilogram,
         'ignored' => null,
     ]);
 
     $uri = (string) $factory->lastRequest()->getUri();
-    expect($uri)->toContain('status=8');
+    expect($uri)->toContain('status=ReadyToSign');
     expect($uri)->toContain('metric=kg');
     expect($uri)->not->toContain('ignored=');
 });
@@ -94,9 +95,9 @@ it('normalizes nested array query values including enums and null omission', fun
 
     $client->http->get('api/general/check', [
         'specialty' => [
-            \Yannelli\DoseSpot\Enums\PrescriptionStatus::ReadyToSend,
+            \Yannelli\DoseSpot\Enums\PrescriptionStatus::ReadyToSign,
             null,
-            \Yannelli\DoseSpot\Enums\WeightMetric::Kilograms,
+            \Yannelli\DoseSpot\Enums\WeightMetric::Kilogram,
         ],
         'filters' => [
             'active' => true,
@@ -106,9 +107,9 @@ it('normalizes nested array query values including enums and null omission', fun
     ]);
 
     $uri = (string) $factory->lastRequest()->getUri();
-    expect($uri)->toContain('specialty%5B0%5D=8');
-    expect($uri)->toContain('specialty%5B2%5D=kg');
-    expect($uri)->not->toContain('specialty%5B1%5D=');
+    expect($uri)->toContain('specialty=ReadyToSign');
+    expect($uri)->toContain('specialty=kg');
+    expect($uri)->not->toContain('specialty%5B');
     expect($uri)->toContain('filters%5Bactive%5D=true');
     expect($uri)->toContain('filters%5BrequestedAt%5D=2026-07-18T14%3A04%3A00');
     expect($uri)->not->toContain('filters%5Bignored%5D=');
@@ -391,6 +392,7 @@ it('forwards configured timeouts to outbound API requests', function () {
     $config = new Config(
         clinicId: '12345',
         clinicKey: 'super-secret-clinic-key-1234567890',
+        subscriptionKey: 'subscription-key',
         environment: Environment::Staging,
         userId: 42,
         timeout: 17,
@@ -462,6 +464,36 @@ it('falls through blank or whitespace hierarchical error fields to the next usef
     }
 });
 
+it('treats a non-OK ResultCode on HTTP 200 as an API error', function () {
+    $factory = factory();
+    $payload = [
+        'Result' => [
+            'ResultCode' => 'ERROR',
+            'ResultDescription' => 'medication is obsolete',
+        ],
+    ];
+    $factory->pushResponse(200, $payload);
+
+    try {
+        $factory->preauthorizedClient()->general()->check();
+        fail('Expected ApiException');
+    } catch (ApiException $e) {
+        expect($e->getMessage())->toBe('medication is obsolete');
+        expect($e->statusCode())->toBe(200);
+        expect($e->responseBody())->toBe($payload);
+    }
+});
+
+it('returns payloads whose ResultCode is OK', function () {
+    $factory = factory();
+    $factory->pushResponse(200, ['Id' => 5, 'Result' => ['ResultCode' => 'OK']]);
+
+    $response = $factory->preauthorizedClient()->patients()->find(5);
+
+    expect($response['Id'])->toBe(5);
+    expect($response['Result']['ResultCode'])->toBe('OK');
+});
+
 it('omits a JSON body when POST helpers pass a null body', function () {
     $factory = factory();
     $factory->pushResponse(200, []);
@@ -470,10 +502,9 @@ it('omits a JSON body when POST helpers pass a null body', function () {
 
     $client = $factory->preauthorizedClient();
 
-    // Prescriptions::send / setPrinted / sendOnBehalfOf call post($path) with no body.
-    $client->prescriptions()->send(5, 99);
-    $client->prescriptions()->setPrinted(5, 99);
-    $client->prescriptions()->sendOnBehalfOf(5, 99, 77);
+    $client->allergies()->createNoKnown(5);
+    $client->clinicians()->resetMyPin();
+    $client->priorAuth()->cancel(5);
 
     foreach ([0, 1, 2] as $index) {
         $request = $factory->history[$index]['request'];

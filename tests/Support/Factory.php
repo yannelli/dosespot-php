@@ -61,8 +61,9 @@ class Factory
         return new Config(
             clinicId: '12345',
             clinicKey: 'super-secret-clinic-key-1234567890',
-            environment: $environment ?? Environment::Staging,
+            subscriptionKey: 'subscription-key',
             userId: 42,
+            environment: $environment ?? Environment::Staging,
         );
     }
 

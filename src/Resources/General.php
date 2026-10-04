@@ -8,7 +8,10 @@ class General extends Resource
 {
     /**
      * GET /api/general/check
-     * Verifies that the API is reachable and the supplied credentials are valid.
+     *
+     * Check API health.
+     *
+     * @dosespot HealthCheck_CheckHealthV2
      */
     public function check(): array
     {
